@@ -74,35 +74,76 @@
 
         /* 菜单分类 */
         .menu-category {
-            margin-bottom: 25px;
+            margin-bottom: 5px;
         }
 
+        /* 一级菜单标题 */
         .category-title {
-            font-size: 14px;
-            color: #6b7280;
+            font-size: 15px;
+            color: #1f2937;
             font-weight: 600;
-            padding: 0 20px;
-            margin-bottom: 10px;
+            padding: 12px 20px;
+            margin-bottom: 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            cursor: pointer;
+            background-color: #f9fafb;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
         }
 
-        /* 菜单项 */
+        .category-title:hover {
+            background-color: #f3f4f6;
+            color: #667eea;
+        }
+
+        .category-title.expanded {
+            background-color: #667eea;
+            color: white;
+        }
+
+        /* 展开/收起图标 */
+        .category-title::after {
+            content: '▶';
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .category-title.expanded::after {
+            transform: rotate(90deg);
+        }
+
+        /* 二级菜单容器 */
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .submenu.expanded {
+            max-height: 500px;
+        }
+
+        /* 二级菜单项 */
         .menu-item {
             display: block;
-            padding: 12px 20px;
-            color: #374151;
+            padding: 10px 20px 10px 40px;
+            color: #6b7280;
             text-decoration: none;
-            font-size: 15px;
+            font-size: 14px;
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
+            background-color: white;
         }
 
         .menu-item:hover {
             background-color: #f3f4f6;
             color: #667eea;
-            padding-left: 25px;
+            padding-left: 45px;
         }
 
         .menu-item.active {
@@ -205,33 +246,41 @@
         <nav class="sidebar">
             <!-- 总览与决策 -->
             <div class="menu-category">
-                <div class="category-title">Overview & Insights</div>
-                <a class="menu-item" data-page="catlink-selfkoc_q2_overview.html">Smart Growth Decision System</a>
-                <a class="menu-item" data-page="catlink-quarterly-performance-dashboard.html">Quarterly Content Performance</a>
+                <div class="category-title expanded">Overview & Insights</div>
+                <div class="submenu expanded">
+                    <a class="menu-item" data-page="catlink-selfkoc_q2_overview.html">Smart Growth Decision System</a>
+                    <a class="menu-item" data-page="catlink-quarterly-performance-dashboard.html">Quarterly Content Performance</a>
+                </div>
             </div>
 
             <!-- 广告投放 -->
             <div class="menu-category">
                 <div class="category-title">Advertising</div>
-                <a class="menu-item" data-page="catlink-ads_June4-18-2025.html">Monthly Ad Dashboard</a>
-                <a class="menu-item" data-page="Catlink_ads_June11-24-2025..html">Two-Week Ad Dashboard</a>
+                <div class="submenu">
+                    <a class="menu-item" data-page="catlink-ads_June4-18-2025.html">Monthly Ad Dashboard</a>
+                    <a class="menu-item" data-page="Catlink_ads_June11-24-2025..html">Two-Week Ad Dashboard</a>
+                </div>
             </div>
 
             <!-- 平台矩阵分析 -->
             <div class="menu-category">
                 <div class="category-title">Platform Analytics</div>
-                <a class="menu-item" data-page="catlink-selfkoc_instagram-performance.html">Instagram Matrix Analysis</a>
-                <a class="menu-item" data-page="catlink-selfkoc_tiktok-performance.html">TikTok Matrix Analysis</a>
-                <a class="menu-item" data-page="catlink-selfkoc_youtube-performance.html">YouTube Shorts Matrix Analysis</a>
+                <div class="submenu">
+                    <a class="menu-item" data-page="catlink-selfkoc_instagram-performance.html">Instagram Matrix Analysis</a>
+                    <a class="menu-item" data-page="catlink-selfkoc_tiktok-performance.html">TikTok Matrix Analysis</a>
+                    <a class="menu-item" data-page="catlink-selfkoc_youtube-performance.html">YouTube Shorts Matrix Analysis</a>
+                </div>
             </div>
 
             <!-- 周度报告 -->
             <div class="menu-category">
                 <div class="category-title">Weekly Reports</div>
-                <a class="menu-item" data-page="catlink-selfkoc_week_performance.html">Social Media Weekly Dashboard</a>
-                <a class="menu-item" data-page="catlink-selfkoc-week_detail_performance.html">Detailed Social Performance</a>
-                <a class="menu-item" data-page="catlink-selfkoc_week_content_performance.html">Weekly Content Performance</a>
-                <a class="menu-item" data-page="catlink-selfkoc_lastweek_performance.html">Self-operated KOC Performance</a>
+                <div class="submenu">
+                    <a class="menu-item" data-page="catlink-selfkoc_week_performance.html">Social Media Weekly Dashboard</a>
+                    <a class="menu-item" data-page="catlink-selfkoc-week_detail_performance.html">Detailed Social Performance</a>
+                    <a class="menu-item" data-page="catlink-selfkoc_week_content_performance.html">Weekly Content Performance</a>
+                    <a class="menu-item" data-page="catlink-selfkoc_lastweek_performance.html">Self-operated KOC Performance</a>
+                </div>
             </div>
         </nav>
 
@@ -249,6 +298,7 @@
 
     <script>
         // 获取DOM元素
+        const categoryTitles = document.querySelectorAll('.category-title');
         const menuItems = document.querySelectorAll('.menu-item');
         const contentFrame = document.getElementById('content-frame');
         const loading = document.getElementById('loading');
@@ -260,7 +310,30 @@
             defaultMenuItem.classList.add('active');
         }
 
-        // 菜单点击事件
+        // 一级菜单展开/收起功能
+        categoryTitles.forEach(title => {
+            title.addEventListener('click', function() {
+                const submenu = this.nextElementSibling;
+                const isExpanded = this.classList.contains('expanded');
+                
+                // 切换当前菜单的展开状态
+                if (isExpanded) {
+                    this.classList.remove('expanded');
+                    submenu.classList.remove('expanded');
+                } else {
+                    // 可选：关闭其他已展开的菜单
+                    // categoryTitles.forEach(t => {
+                    //     t.classList.remove('expanded');
+                    //     t.nextElementSibling.classList.remove('expanded');
+                    // });
+                    
+                    this.classList.add('expanded');
+                    submenu.classList.add('expanded');
+                }
+            });
+        });
+
+        // 二级菜单点击事件
         menuItems.forEach(item => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -279,6 +352,14 @@
                 
                 // 加载页面
                 contentFrame.src = page;
+                
+                // 确保父级菜单是展开状态
+                const parentSubmenu = this.parentElement;
+                const parentTitle = parentSubmenu.previousElementSibling;
+                if (!parentSubmenu.classList.contains('expanded')) {
+                    parentSubmenu.classList.add('expanded');
+                    parentTitle.classList.add('expanded');
+                }
             });
         });
 
