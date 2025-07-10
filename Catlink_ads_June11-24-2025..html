@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catlink Two-Week Ad Performance Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: #1a1a1a;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+        .date-range {
+            color: #666;
+            font-size: 1.2em;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .summary-card {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-label {
+            color: #6b7280;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .card-value {
+            font-size: 2.4em;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .card-change {
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .neutral { color: #f59e0b; }
+        
+        .week-comparison {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .week-box {
+            padding: 20px;
+            border-radius: 12px;
+            background: #f9fafb;
+        }
+        .week-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+        .week-metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        
+        .insights-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin: 30px 0;
+        }
+        .insights-box h3 {
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+        .insights-box ul {
+            margin: 0;
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+        .insights-box li {
+            margin-bottom: 12px;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        .chart-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+        }
+        
+        .performance-table {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f3f4f6;
+            padding: 14px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .trend-neutral { color: #6b7280; }
+        
+        canvas {
+            max-height: 400px;
+        }
+        
+        .arrow {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            margin-right: 4px;
+        }
+        .arrow-up {
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 8px solid #10b981;
+        }
+        .arrow-down {
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Catlink Two-Week Ad Performance Dashboard</h1>
+            <div class="date-range">June 11-24, 2025 | Campaign: Prox Sales 5.18</div>
+        </div>
+        
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="card-label">Total Ad Spend</div>
+                <div class="card-value">$1,125.93</div>
+                <div class="card-change">
+                    <span>Two-week investment</span>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="card-label">Total Revenue</div>
+                <div class="card-value positive">$4,838.09</div>
+                <div class="card-change positive">
+                    <span class="arrow arrow-up"></span>
+                    <span>+330% return on investment</span>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="card-label">Overall ROAS</div>
+                <div class="card-value positive">4.30x</div>
+                <div class="card-change positive">
+                    <span>Excellent performance</span>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="card-label">Net Profit</div>
+                <div class="card-value positive">$3,712.16</div>
+                <div class="card-change positive">
+                    <span>After all ad costs</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="week-comparison">
+            <h3 class="chart-title">Week-over-Week Performance</h3>
+            <div class="comparison-grid">
+                <div class="week-box">
+                    <div class="week-title">Week 1 (June 11-17)</div>
+                    <div class="week-metric">
+                        <span>Ad Spend</span>
+                        <strong>$548.54</strong>
+                    </div>
+                    <div class="week-metric">
+                        <span>Revenue</span>
+                        <strong>$1,651.23</strong>
+                    </div>
+                    <div class="week-metric">
+                        <span>ROAS</span>
+                        <strong>3.01x</strong>
+                    </div>
+                    <div class="week-metric">
+                        <span>Net Profit</span>
+                        <strong>$1,102.69</strong>
+                    </div>
+                </div>
+                <div class="week-box">
+                    <div class="week-title">Week 2 (June 18-24)</div>
+                    <div class="week-metric">
+                        <span>Ad Spend</span>
+                        <strong>$577.39</strong>
+                        <span class="trend-up">(+5.3%)</span>
+                    </div>
+                    <div class="week-metric">
+                        <span>Revenue</span>
+                        <strong>$3,186.86</strong>
+                        <span class="trend-up">(+93.0%)</span>
+                    </div>
+                    <div class="week-metric">
+                        <span>ROAS</span>
+                        <strong>5.52x</strong>
+                        <span class="trend-up">(+83.4%)</span>
+                    </div>
+                    <div class="week-metric">
+                        <span>Net Profit</span>
+                        <strong>$2,609.47</strong>
+                        <span class="trend-up">(+136.7%)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insights-box">
+            <h3>🔍 Key Insights & Strategic Recommendations</h3>
+            <ul>
+                <li><strong>Momentum Building:</strong> Week 2 showed 93% revenue growth with only 5.3% increase in spend, demonstrating improved efficiency</li>
+                <li><strong>Champion Ad:</strong> copy_5C72E443 generated $4,121.22 total revenue (85% of all revenue) with consistent 6.37x ROAS</li>
+                <li><strong>Volatility Alert:</strong> copy_55E4C415 had exceptional Week 1 performance (18.63x ROAS) but zero conversions in Week 2</li>
+                <li><strong>Turnaround Success:</strong> Flexi improved from 0.87x to 2.44x ROAS, showing positive optimization impact</li>
+                <li><strong>Budget Drain:</strong> lv_0_20250313 consumed $239 over two weeks with minimal return (0.09x ROAS)</li>
+                <li><strong>Scaling Opportunity:</strong> With 4.30x overall ROAS, there's room to significantly increase budget on proven performers</li>
+            </ul>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Weekly Revenue Trend by Ad</h3>
+                <canvas id="weeklyTrendChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Two-Week ROAS Performance</h3>
+                <canvas id="roasComparisonChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Ad Spend Distribution</h3>
+                <canvas id="spendDistributionChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Revenue Contribution</h3>
+                <canvas id="revenueContributionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Ad Efficiency Matrix</h3>
+            <canvas id="efficiencyChart"></canvas>
+        </div>
+
+        <div class="performance-table">
+            <h3 class="chart-title">Detailed Two-Week Performance Summary</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ad Name</th>
+                        <th>Total Spend</th>
+                        <th>Total Revenue</th>
+                        <th>Two-Week ROAS</th>
+                        <th>Week 1 → Week 2</th>
+                        <th>Performance Trend</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>copy_5C72E443</strong></td>
+                        <td>$646.92</td>
+                        <td>$4,121.22</td>
+                        <td><strong>6.37x</strong></td>
+                        <td>3.54x → 8.68x</td>
+                        <td><span class="trend-up">↑ +145%</span></td>
+                        <td style="color: #10b981;"><strong>Scale Aggressively</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>copy_55E4C415</strong></td>
+                        <td>$73.86</td>
+                        <td>$503.98</td>
+                        <td><strong>6.82x</strong></td>
+                        <td>18.63x → 0.00x</td>
+                        <td><span class="trend-down">↓ -100%</span></td>
+                        <td style="color: #f59e0b;">Investigate & Test</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flexi</strong></td>
+                        <td>$165.36</td>
+                        <td>$191.92</td>
+                        <td>1.16x</td>
+                        <td>0.87x → 2.44x</td>
+                        <td><span class="trend-up">↑ +181%</span></td>
+                        <td style="color: #3b82f6;">Continue Optimizing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>lv_0_20250313</strong></td>
+                        <td>$239.00</td>
+                        <td>$20.97</td>
+                        <td>0.09x</td>
+                        <td>0.00x → 0.15x</td>
+                        <td><span class="trend-up">↑ Minimal</span></td>
+                        <td style="color: #ef4444;">Pause Immediately</td>
+                    </tr>
+                    <tr>
+                        <td><strong>lv_0_20250322</strong></td>
+                        <td>$0.79</td>
+                        <td>$0.00</td>
+                        <td>0.00x</td>
+                        <td>0.00x → N/A</td>
+                        <td><span class="trend-neutral">—</span></td>
+                        <td style="color: #ef4444;">Remove</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Chart configuration
+        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        Chart.defaults.color = '#374151';
+        
+        // Weekly Trend Chart
+        const ctx1 = document.getElementById('weeklyTrendChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2'],
+                datasets: [{
+                    label: 'copy_5C72E443',
+                    data: [1030.31, 3090.91],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.3,
+                    borderWidth: 3
+                }, {
+                    label: 'copy_55E4C415',
+                    data: [503.98, 0],
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    tension: 0.3,
+                    borderWidth: 3
+                }, {
+                    label: 'Flexi',
+                    data: [116.94, 74.98],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.3,
+                    borderWidth: 3
+                }, {
+                    label: 'lv_0_20250313',
+                    data: [0, 20.97],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.3,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // ROAS Comparison Chart
+        const ctx2 = document.getElementById('roasComparisonChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['copy_5C72E443', 'copy_55E4C415', 'Flexi', 'lv_0_20250313', 'lv_0_20250322'],
+                datasets: [{
+                    label: 'Week 1 ROAS',
+                    data: [3.54, 18.63, 0.87, 0, 0],
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderRadius: 8
+                }, {
+                    label: 'Week 2 ROAS',
+                    data: [8.68, 0, 2.44, 0.15, 0],
+                    backgroundColor: 'rgba(116, 75, 162, 0.8)',
+                    borderRadius: 8
+                }, {
+                    label: 'Two-Week Average',
+                    data: [6.37, 6.82, 1.16, 0.09, 0],
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + 'x';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Spend Distribution Chart
+        const ctx3 = document.getElementById('spendDistributionChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'doughnut',
+            data: {
+                labels: ['copy_5C72E443', 'lv_0_20250313', 'Flexi', 'copy_55E4C415', 'lv_0_20250322'],
+                datasets: [{
+                    data: [646.92, 239.00, 165.36, 73.86, 0.79],
+                    backgroundColor: [
+                        '#667eea',
+                        '#ef4444',
+                        '#10b981',
+                        '#f59e0b',
+                        '#6b7280'
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const percentage = ((context.parsed / 1125.93) * 100).toFixed(1);
+                                return context.label + ': $' + context.parsed + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Revenue Contribution Chart
+        const ctx4 = document.getElementById('revenueContributionChart').getContext('2d');
+        new Chart(ctx4, {
+            type: 'pie',
+            data: {
+                labels: ['copy_5C72E443', 'copy_55E4C415', 'Flexi', 'lv_0_20250313'],
+                datasets: [{
+                    data: [4121.22, 503.98, 191.92, 20.97],
+                    backgroundColor: [
+                        '#667eea',
+                        '#f59e0b',
+                        '#10b981',
+                        '#ef4444'
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const percentage = ((context.parsed / 4838.09) * 100).toFixed(1);
+                                return context.label + ': $' + context.parsed + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Efficiency Matrix (Bubble Chart)
+        const ctx5 = document.getElementById('efficiencyChart').getContext('2d');
+        new Chart(ctx5, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'copy_5C72E443',
+                    data: [{x: 646.92, y: 6.37, r: 30}],
+                    backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                    borderColor: '#667eea'
+                }, {
+                    label: 'copy_55E4C415',
+                    data: [{x: 73.86, y: 6.82, r: 15}],
+                    backgroundColor: 'rgba(245, 158, 11, 0.6)',
+                    borderColor: '#f59e0b'
+                }, {
+                    label: 'Flexi',
+                    data: [{x: 165.36, y: 1.16, r: 10}],
+                    backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                    borderColor: '#10b981'
+                }, {
+                    label: 'lv_0_20250313',
+                    data: [{x: 239.00, y: 0.09, r: 8}],
+                    backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                    borderColor: '#ef4444'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': Spend $' + context.parsed.x + ', ROAS ' + context.parsed.y + 'x';
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Bubble size represents revenue contribution'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Total Spend ($)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'ROAS (x)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

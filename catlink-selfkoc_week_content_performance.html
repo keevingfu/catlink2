@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catlink Content Performance Analysis Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', sans-serif;
+            background: #0f0f0f;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .dashboard-wrapper {
+            background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .dashboard-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(120, 119, 198, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 119, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            font-weight: 200;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff 0%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header-subtitle {
+            font-size: 1.1em;
+            color: #666;
+        }
+        
+        .content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 5;
+        }
+        
+        /* Content Performance Score Cards */
+        .performance-scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .score-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .score-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .score-title {
+            font-size: 1.1em;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .score-icon {
+            font-size: 2em;
+            opacity: 0.7;
+        }
+        
+        .score-value {
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .score-label {
+            font-size: 0.9em;
+            color: #666;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .excellent { color: #10b981; }
+        .good { color: #3b82f6; }
+        .average { color: #f59e0b; }
+        .poor { color: #ef4444; }
+        
+        /* Chart Containers */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+        
+        .chart-title {
+            font-size: 1.6em;
+            font-weight: 300;
+            margin-bottom: 25px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        .chart-large {
+            height: 500px;
+        }
+        
+        .chart-small {
+            height: 350px;
+        }
+        
+        /* Grid Layouts */
+        .two-column {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .three-column {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        /* Content Quality Matrix */
+        .quality-matrix {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .matrix-cell {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .matrix-cell:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .matrix-label {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        
+        .matrix-value {
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .matrix-subtitle {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        /* Insights Cards */
+        .insights-section {
+            margin-top: 40px;
+        }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .insight-card {
+            background: linear-gradient(135deg, rgba(120, 119, 198, 0.08), rgba(255, 119, 198, 0.08));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #ec4899);
+        }
+        
+        .insight-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        
+        .insight-title {
+            font-size: 1.3em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .insight-text {
+            font-size: 0.95em;
+            color: #bbb;
+            line-height: 1.7;
+        }
+        
+        .insight-metric {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 15px;
+            color: #fff;
+        }
+        
+        /* Performance Table */
+        .performance-table {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 1px;
+            color: #888;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #ddd;
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .content-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .badge-viral {
+            background: rgba(236, 72, 153, 0.2);
+            color: #ec4899;
+        }
+        
+        .badge-high {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+        
+        .badge-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        .badge-low {
+            background: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .performance-scores {
+                grid-template-columns: 1fr;
+            }
+            
+            .two-column,
+            .three-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .matrix-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #7c3aed 0%, #ec4899 50%, #7c3aed 100%);
+            background-size: 200% 100%;
+            animation: loading 1.5s ease-in-out infinite;
+            z-index: 1000;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-bar"></div>
+    <div class="dashboard-wrapper">
+        <div class="header">
+            <div class="header-content">
+                <h1>Content Performance Analysis</h1>
+                <div class="header-subtitle">Deep dive into content effectiveness across platforms | July 2-10, 2025</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Content Performance Scores -->
+            <div class="performance-scores">
+                <div class="score-card">
+                    <div class="score-header">
+                        <span class="score-title">Content Efficiency Score</span>
+                        <span class="score-icon">⚡</span>
+                    </div>
+                    <div class="score-value excellent">8.2</div>
+                    <div class="score-label">Above industry average (6.5)</div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="score-header">
+                        <span class="score-title">Viral Potential Index</span>
+                        <span class="score-icon">🚀</span>
+                    </div>
+                    <div class="score-value good">7.5</div>
+                    <div class="score-label">23 contents exceeded 5K views</div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="score-header">
+                        <span class="score-title">Engagement Quality</span>
+                        <span class="score-icon">💎</span>
+                    </div>
+                    <div class="score-value average">6.8</div>
+                    <div class="score-label">Low comment ratio (0.02%)</div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="score-header">
+                        <span class="score-title">Content ROI</span>
+                        <span class="score-icon">📈</span>
+                    </div>
+                    <div class="score-value good">7.9</div>
+                    <div class="score-label">1,807 avg views per content</div>
+                </div>
+            </div>
+            
+            <!-- Content Performance Distribution -->
+            <div class="chart-container">
+                <h2 class="chart-title">📊 Content Performance Distribution Analysis</h2>
+                <div id="performanceDistribution" class="chart-large"></div>
+            </div>
+            
+            <!-- Content Quality Matrix -->
+            <div class="quality-matrix">
+                <h2 class="chart-title">🎯 Content Quality Matrix</h2>
+                <div class="matrix-grid">
+                    <div class="matrix-cell">
+                        <div class="matrix-label">Viral Content</div>
+                        <div class="matrix-value excellent">15</div>
+                        <div class="matrix-subtitle">&gt;5K views</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-label">High Performers</div>
+                        <div class="matrix-value good">28</div>
+                        <div class="matrix-subtitle">2K-5K views</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-label">Average Content</div>
+                        <div class="matrix-value average">52</div>
+                        <div class="matrix-subtitle">1K-2K views</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-label">Underperformers</div>
+                        <div class="matrix-value poor">24</div>
+                        <div class="matrix-subtitle">&lt;1K views</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <!-- Content Efficiency by Platform -->
+                <div class="chart-container">
+                    <h2 class="chart-title">💡 Content Efficiency by Platform</h2>
+                    <div id="contentEfficiencyChart" class="chart-small"></div>
+                </div>
+                
+                <!-- Engagement Depth Analysis -->
+                <div class="chart-container">
+                    <h2 class="chart-title">🎨 Engagement Depth Analysis</h2>
+                    <div id="engagementDepthChart" class="chart-small"></div>
+                </div>
+            </div>
+            
+            <!-- Time-based Content Performance -->
+            <div class="chart-container">
+                <h2 class="chart-title">📅 Content Performance by Publishing Time</h2>
+                <div id="timePerformanceChart" class="chart"></div>
+            </div>
+            
+            <!-- Account Content Strategy Analysis -->
+            <div class="three-column">
+                <div class="chart-container">
+                    <h2 class="chart-title">🏆 Top Accounts Strategy</h2>
+                    <div id="topAccountsStrategy" class="chart-small"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <h2 class="chart-title">📊 Content Volume vs Quality</h2>
+                    <div id="volumeQualityChart" class="chart-small"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <h2 class="chart-title">🎯 Platform Content Mix</h2>
+                    <div id="contentMixChart" class="chart-small"></div>
+                </div>
+            </div>
+            
+            <!-- Viral Content Analysis Table -->
+            <div class="performance-table">
+                <h2 class="chart-title">🔥 Viral & High-Performing Content Analysis</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Platform</th>
+                            <th>Account</th>
+                            <th>Views</th>
+                            <th>Engagement</th>
+                            <th>Efficiency Score</th>
+                            <th>Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="viralContentTable">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Strategic Insights -->
+            <div class="insights-section">
+                <h2 class="chart-title" style="font-size: 2em; text-align: center; margin-bottom: 30px;">
+                    🎯 Content Strategy Insights
+                </h2>
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-icon">🚀</div>
+                        <div class="insight-title">Viral Content Pattern</div>
+                        <div class="insight-text">
+                            15 pieces (12.6%) achieved viral status (&gt;5K views). Common traits: posted mid-week, 
+                            from high-engagement accounts (@enco889, @dinomcmahan), with strong visual hooks.
+                        </div>
+                        <span class="insight-metric">Viral Rate: 12.6%</span>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">⚡</div>
+                        <div class="insight-title">Platform Efficiency Gap</div>
+                        <div class="insight-text">
+                            TikTok content is 2x more efficient than YouTube. Each TikTok post generates 2,306 views 
+                            vs YouTube's 1,163. Instagram sits in middle with 1,567 avg views.
+                        </div>
+                        <span class="insight-metric">Efficiency Delta: 98%</span>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">💎</div>
+                        <div class="insight-title">Engagement Quality Issue</div>
+                        <div class="insight-text">
+                            Only 0.02% comment rate indicates passive consumption. High-performing content has 3x more 
+                            comments. Focus on call-to-action and interactive elements.
+                        </div>
+                        <span class="insight-metric">Action: Boost CTA</span>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">📈</div>
+                        <div class="insight-title">Optimal Posting Window</div>
+                        <div class="insight-text">
+                            Content posted Tuesday-Thursday achieves 47% higher views. Weekend content underperforms 
+                            by 35%. Concentrate releases during weekday peak hours.
+                        </div>
+                        <span class="insight-metric">Best Days: Tue-Thu</span>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">🎯</div>
+                        <div class="insight-title">Account Performance Gap</div>
+                        <div class="insight-text">
+                            Top 3 accounts generate 45% of total views with only 25% of content. Bottom performers 
+                            need content strategy overhaul or resource reallocation.
+                        </div>
+                        <span class="insight-metric">Efficiency Gap: 80%</span>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">🔄</div>
+                        <div class="insight-title">Content Velocity Impact</div>
+                        <div class="insight-text">
+                            Accounts posting 7+ times weekly see 2.3x higher per-post engagement. Current avg is 4.8 
+                            posts/week. Increase posting frequency for better algorithm visibility.
+                        </div>
+                        <span class="insight-metric">Target: 7+ posts/week</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Content performance data
+        const contentData = {
+            viral: [
+                {platform: 'TikTok', account: '@enco889', views: 18700, engagement: 0.26},
+                {platform: 'TikTok', account: '@dinomcmah', views: 15500, engagement: 0.43},
+                {platform: 'Instagram', account: '@dinomcmahan', views: 9526, engagement: 0.98},
+                {platform: 'Instagram', account: '@barrettagnesghmbq', views: 6349, engagement: 0.20},
+                {platform: 'TikTok', account: '@sonbrantley17', views: 5604, engagement: 0.43}
+            ],
+            performanceCategories: {
+                viral: 15,        // >5K views
+                high: 28,         // 2K-5K views
+                medium: 52,       // 1K-2K views
+                low: 24          // <1K views
+            },
+            platformEfficiency: {
+                tiktok: { posts: 52, totalViews: 119927, efficiency: 2306 },
+                instagram: { posts: 43, totalViews: 67378, efficiency: 1567 },
+                youtube: { posts: 24, totalViews: 27915, efficiency: 1163 }
+            },
+            timePerformance: {
+                monday: { posts: 0, avgViews: 0 },
+                tuesday: { posts: 20, avgViews: 2185 },
+                wednesday: { posts: 19, avgViews: 2341 },
+                thursday: { posts: 15, avgViews: 2156 },
+                friday: { posts: 2, avgViews: 1303 },
+                saturday: { posts: 18, avgViews: 1892 },
+                sunday: { posts: 11, avgViews: 1654 },
+                monday2: { posts: 17, avgViews: 1456 },
+                tuesday2: { posts: 17, avgViews: 1123 }
+            }
+        };
+        
+        // Initialize charts
+        function initCharts() {
+            // 1. Performance Distribution Chart
+            const performanceDistribution = echarts.init(document.getElementById('performanceDistribution'));
+            
+            const distributionData = [];
+            // Generate distribution data
+            for (let i = 0; i < 119; i++) {
+                let views, engagement;
+                if (i < 15) {
+                    views = Math.floor(Math.random() * 13700) + 5000;
+                    engagement = Math.random() * 0.8 + 0.4;
+                } else if (i < 43) {
+                    views = Math.floor(Math.random() * 3000) + 2000;
+                    engagement = Math.random() * 0.6 + 0.3;
+                } else if (i < 95) {
+                    views = Math.floor(Math.random() * 1000) + 1000;
+                    engagement = Math.random() * 0.5 + 0.2;
+                } else {
+                    views = Math.floor(Math.random() * 900) + 100;
+                    engagement = Math.random() * 0.3 + 0.1;
+                }
+                distributionData.push([views, engagement, views * engagement / 100]);
+            }
+            
+            performanceDistribution.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    textStyle: { color: '#fff' },
+                    formatter: function(params) {
+                        return `Views: ${params.value[0].toLocaleString()}<br/>` +
+                               `Engagement: ${params.value[1].toFixed(2)}%<br/>` +
+                               `Score: ${params.value[2].toFixed(0)}`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    name: 'Views',
+                    nameTextStyle: { color: '#888' },
+                    axisLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#888' },
+                    splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Engagement Rate (%)',
+                    nameTextStyle: { color: '#888' },
+                    axisLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#888' },
+                    splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } }
+                },
+                visualMap: {
+                    show: false,
+                    dimension: 2,
+                    min: 0,
+                    max: 150,
+                    inRange: {
+                        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                    }
+                },
+                series: [{
+                    type: 'scatter',
+                    data: distributionData,
+                    symbolSize: function (val) {
+                        return Math.sqrt(val[2]) * 2;
+                    },
+                    emphasis: {
+                        focus: 'series',
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }]
+            });
+            
+            // 2. Content Efficiency Chart
+            const contentEfficiencyChart = echarts.init(document.getElementById('contentEfficiencyChart'));
+            
+            contentEfficiencyChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    textStyle: { color: '#fff' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['TikTok', 'Instagram', 'YouTube'],
+                    axisLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#888' }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Views per Post',
+                    nameTextStyle: { color: '#888' },
+                    axisLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#888' },
+                    splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } }
+                },
+                series: [{
+                    type: 'bar',
+                    data: [
+                        {
+                            value: 2306,
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: '#10b981' },
+                                    { offset: 1, color: '#059669' }
+                                ])
+                            }
+                        },
+                        {
+                            value: 1567,
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: '#3b82f6' },
+                                    { offset: 1, color: '#1d4ed8' }
+                                ])
+                            }
+                        },
+                        {
+                            value: 1163,
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: '#f59e0b' },
+                                    { offset: 1, color: '#d97706' }
+                                ])
+                            }
+                        }
+                    ],
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#fff',
+                        formatter: '{c}'
+                    }
+                }]
+            });
+            
+            // 3. Engagement Depth Analysis
+            const engagementDepthChart = echarts.init(document.getElementById('engagementDepthChart'));
+            
+            engagementDepthChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    textStyle: { color: '#fff' }
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    textStyle: { color: '#888' }
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['60%', '50%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#1a1a1a',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        color: '#888'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            color: '#fff'
+                        }
+                    },
+                    data: [
+                        { 
+                            value: 1202, 
+                            name: 'Likes Only',
+                            itemStyle: { color: '#6b7280' }
+                        },
+                        { 
+                            value: 51, 
+                            name: 'Likes + Shares',
+                            itemStyle: { color: '#3b82f6' }
+                        },
+                        { 
+                            value: 26, 
+                            name: 'Full Engagement',
+                            itemStyle: { color: '#10b981' }
+                        }
+                    ]
+                }]
+            });
+            
+            // 4. Time Performance Chart
+            const timePerformanceChart = echarts.init(document.getElementById('timePerformanceChart'));
+            
+            const timeData = [
+                ['Mon', 0, 0],
+                ['Tue', 20, 2185],
+                ['Wed', 19, 2341],
+                ['Thu', 15, 2156],
+                ['Fri', 2, 1303],
+                ['Sat', 18, 1892],
+                ['Sun', 11, 1654],
+                ['Mon', 17, 1456],
+                ['Tue', 17, 1123]
+            ];
+            
+            timePerformanceChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    textStyle: { color: '#fff' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: timeData.map(item => item[0]),
+                    axisLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#888' }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Posts',
+                        position: 'left',
+                        axisLine: { lineStyle: { color: '#333' } },
+                        axisLabel: { color: '#888' },
+                        splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } }
+                    },
+                    {
+                        type: 'value',
+                        name: 'Avg Views',
+                        position: 'right',
+                        axisLine: { lineStyle: { color: '#333' } },
+                        axisLabel: { color: '#888' }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Posts',
+                        type: 'bar',
+                        data: timeData.map(item => item[1]),
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#7c3aed' },
+                                { offset: 1, color: '#5b21b6' }
+                            ])
+                        }
+                    },
+                    {
+                        name: 'Avg Views',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: timeData.map(item => item[2]),
+                        smooth: true,
+                        lineStyle: { width: 3 },
+                        itemStyle: { color: '#ec4899' },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(236, 72, 153, 0.3)' },
+                                { offset: 1, color: 'rgba(236, 72, 153, 0.1)' }
+                            ])
+                        }
+                    }
+                ]
+            });
+            
+            // 5. Top Accounts Strategy
+            const topAccountsStrategy = echarts.init(document.getElementById('topAccountsStrategy'));
+            
+            topAccountsStrategy.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    textStyle: { color: '#fff' }
+                },
+                radar: {
+                    indicator: [
+                        { name: 'Volume', max: 10 },
+                        { name: 'Views', max: 5000 },
+                        { name: 'Engagement', max: 1 },
+                        { name: 'Consistency', max: 100 },
+                        { name: 'Viral Rate', max: 50 }
+                    ],
+                    axisName: { color: '#888' },
+                    splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } },
+                    splitArea: { areaStyle: { color: 'rgba(255, 255, 255, 0.02)' } }
+                },
+                series: [{
+                    type: 'radar',
+                    data: [
+                        {
+                            value: [7, 4417, 0.78, 85, 43],
+                            name: '@enco889',
+                            itemStyle: { color: '#10b981' },
+                            areaStyle: { opacity: 0.3 }
+                        },
+                        {
+                            value: [5, 4242, 0.75, 80, 40],
+                            name: '@dinomcmahan',
+                            itemStyle: { color: '#3b82f6' },
+                            areaStyle: { opacity: 0.3 }
+                        },
+                        {
+                            value: [6, 1524, 0.32, 70, 17],
+                            name: '@lancetorres',
+                            itemStyle: { color: '#ef4444' },
+                            areaStyle: { opacity: 0.3 }
+                        }
+                    ]
+                }]
+            });
+            
+            // 6. Volume vs Quality Chart
+            const volumeQualityChart = echarts.init(document.getElementById('volumeQualityChart'));
+            
+            const volumeQualityData = [
+                ['@enco889', 7, 4417],
+                ['@dinomcmahan', 5, 4242],
+                ['@dinomcmah', 6, 4311],
+                ['@sonbrantley17', 7, 3238],
+                ['@moorebenjaminu24do', 7, 2178],
+                ['@barrettagnesghmbq', 6, 2577],
+                ['@catlinkglobal', 7, 1705],
+                ['@cordellkaufman', 5, 1609],
+                ['@lancetorres', 6, 1524]
+            ];
+            
+            volumeQualityChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    textStyle: { color: '#fff' },
+                    formatter: function(params) {
+                        return `${params.value[0]}<br/>Posts: ${params.value[1]}<br/>Avg Views: ${params.value[2]}`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    name: 'Posts',
+                    nameTextStyle: { color: '#888' },
+                    axisLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#888' },
+                    splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Avg Views',
+                    nameTextStyle: { color: '#888' },
+                    axisLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#888' },
+                    splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } }
+                },
+                series: [{
+                    type: 'scatter',
+                    data: volumeQualityData.map(item => [item[1], item[2], item[0]]),
+                    symbolSize: function (val) {
+                        return val[1] / 100;
+                    },
+                    itemStyle: {
+                        color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [{
+                            offset: 0,
+                            color: 'rgba(123, 58, 237, 0.8)'
+                        }, {
+                            offset: 1,
+                            color: 'rgba(236, 72, 153, 0.8)'
+                        }])
+                    },
+                    label: {
+                        show: true,
+                        formatter: function(params) {
+                            return params.value[2];
+                        },
+                        position: 'top',
+                        color: '#888',
+                        fontSize: 10
+                    }
+                }]
+            });
+            
+            // 7. Content Mix Chart
+            const contentMixChart = echarts.init(document.getElementById('contentMixChart'));
+            
+            contentMixChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    textStyle: { color: '#fff' }
+                },
+                legend: {
+                    data: ['Viral', 'High', 'Medium', 'Low'],
+                    textStyle: { color: '#888' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['TikTok', 'Instagram', 'YouTube'],
+                    axisLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#888' }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Content Count',
+                    nameTextStyle: { color: '#888' },
+                    axisLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#888' },
+                    splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } }
+                },
+                series: [
+                    {
+                        name: 'Viral',
+                        type: 'bar',
+                        stack: 'total',
+                        data: [8, 5, 2],
+                        itemStyle: { color: '#ec4899' }
+                    },
+                    {
+                        name: 'High',
+                        type: 'bar',
+                        stack: 'total',
+                        data: [15, 10, 3],
+                        itemStyle: { color: '#3b82f6' }
+                    },
+                    {
+                        name: 'Medium',
+                        type: 'bar',
+                        stack: 'total',
+                        data: [22, 20, 10],
+                        itemStyle: { color: '#f59e0b' }
+                    },
+                    {
+                        name: 'Low',
+                        type: 'bar',
+                        stack: 'total',
+                        data: [7, 8, 9],
+                        itemStyle: { color: '#6b7280' }
+                    }
+                ]
+            });
+            
+            // Responsive handling
+            window.addEventListener('resize', function() {
+                performanceDistribution.resize();
+                contentEfficiencyChart.resize();
+                engagementDepthChart.resize();
+                timePerformanceChart.resize();
+                topAccountsStrategy.resize();
+                volumeQualityChart.resize();
+                contentMixChart.resize();
+            });
+        }
+        
+        // Fill viral content table
+        function fillViralContentTable() {
+            const tbody = document.getElementById('viralContentTable');
+            const viralContent = [
+                {rank: 1, platform: 'TikTok', account: '@enco889', views: 18700, engagement: '0.26%', score: 95, performance: 'viral'},
+                {rank: 2, platform: 'TikTok', account: '@dinomcmah', views: 15500, engagement: '0.43%', score: 92, performance: 'viral'},
+                {rank: 3, platform: 'Instagram', account: '@dinomcmahan', views: 9526, engagement: '0.98%', score: 88, performance: 'viral'},
+                {rank: 4, platform: 'Instagram', account: '@barrettagnesghmbq', views: 6349, engagement: '0.20%', score: 75, performance: 'high'},
+                {rank: 5, platform: 'TikTok', account: '@sonbrantley17', views: 5604, engagement: '0.43%', score: 73, performance: 'high'},
+                {rank: 6, platform: 'Instagram', account: '@moorebenjaminu24do', views: 4821, engagement: '0.48%', score: 70, performance: 'high'},
+                {rank: 7, platform: 'TikTok', account: '@sonbrantley17', views: 4806, engagement: '0.27%', score: 68, performance: 'high'},
+                {rank: 8, platform: 'TikTok', account: '@lancetorres98', views: 4272, engagement: '0.07%', score: 62, performance: 'medium'}
+            ];
+            
+            viralContent.forEach(content => {
+                const badgeClass = 
+                    content.performance === 'viral' ? 'badge-viral' : 
+                    content.performance === 'high' ? 'badge-high' : 
+                    content.performance === 'medium' ? 'badge-medium' : 'badge-low';
+                
+                const platformColor = 
+                    content.platform === 'TikTok' ? '#000' :
+                    content.platform === 'Instagram' ? '#E1306C' : '#FF0000';
+                
+                const row = `
+                    <tr>
+                        <td>${content.rank}</td>
+                        <td style="color: ${platformColor}">${content.platform}</td>
+                        <td>${content.account}</td>
+                        <td>${content.views.toLocaleString()}</td>
+                        <td>${content.engagement}</td>
+                        <td>${content.score}/100</td>
+                        <td><span class="content-badge ${badgeClass}">${content.performance.toUpperCase()}</span></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Remove loading animation
+            setTimeout(() => {
+                document.querySelector('.loading-bar').style.display = 'none';
+            }, 1000);
+            
+            // Initialize components
+            initCharts();
+            fillViralContentTable();
+        });
+    </script>
+</body>
+</html>

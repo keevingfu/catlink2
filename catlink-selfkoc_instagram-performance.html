@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catlink Instagram Self-Operated Matrix Analysis Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #E1306C 0%, #F77737 50%, #FCAF45 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #E1306C 0%, #F77737 50%, #FCAF45 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            transform: rotate(30deg);
+            animation: slide 20s linear infinite;
+        }
+        
+        @keyframes slide {
+            0% {
+                transform: rotate(30deg) translateX(0);
+            }
+            100% {
+                transform: rotate(30deg) translateX(28.28px);
+            }
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #E1306C, #F77737, #FCAF45);
+        }
+        
+        .metric-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #E1306C 0%, #F77737 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(225, 48, 108, 0.3);
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metric-value {
+            font-size: 2.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .metric-trend {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .trend-up {
+            color: #10b981;
+        }
+        
+        .trend-down {
+            color: #ef4444;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        .chart-small {
+            height: 300px;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .top-posts-table {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .account-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, rgba(225, 48, 108, 0.1), rgba(247, 119, 55, 0.1));
+            color: #E1306C;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .insights-section {
+            background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .insights-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: rotate 60s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .insight-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .insight-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .insight-card p {
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+        
+        .performance-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .badge-excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-good {
+            background: #ddd6fe;
+            color: #4c1d95;
+        }
+        
+        .badge-average {
+            background: #fed7aa;
+            color: #92400e;
+        }
+        
+        .badge-poor {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .comparison-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .comparison-item {
+            text-align: center;
+        }
+        
+        .comparison-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .comparison-value {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .instagram-color {
+            color: #E1306C;
+        }
+        
+        .tiktok-color {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>CATLINK INSTAGRAM SELF-OPERATED MATRIX ANALYSIS</h1>
+            <div class="subtitle">July 2 - July 9, 2025 | Data Insights & Optimization Recommendations</div>
+        </div>
+        
+        <div class="content">
+            <!-- Core Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">📸</div>
+                    <div class="metric-label">Total Posts</div>
+                    <div class="metric-value">43</div>
+                    <div class="metric-trend">Average 6.1 posts per day</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">👁️</div>
+                    <div class="metric-label">Total Views</div>
+                    <div class="metric-value">67.4K</div>
+                    <div class="metric-trend">Average 1,567 per post</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">💗</div>
+                    <div class="metric-label">Total Engagement</div>
+                    <div class="metric-value">367</div>
+                    <div class="metric-trend">Likes 357 | Comments 10</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-label">Average Engagement Rate</div>
+                    <div class="metric-value">0.54%</div>
+                    <div class="metric-trend">0.11% lower than TikTok</div>
+                </div>
+            </div>
+            
+            <!-- Instagram vs TikTok Comparison -->
+            <div class="comparison-section">
+                <h2 class="chart-title">📱 Instagram vs TikTok Platform Comparison</h2>
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <div class="comparison-label">Platform</div>
+                        <div class="comparison-value instagram-color">Instagram</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Total Views</div>
+                        <div class="comparison-value">67.4K</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Average Views</div>
+                        <div class="comparison-value">1,567</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Engagement Rate</div>
+                        <div class="comparison-value">0.54%</div>
+                    </div>
+                </div>
+                <div class="comparison-grid" style="margin-top: 10px;">
+                    <div class="comparison-item">
+                        <div class="comparison-label">Platform</div>
+                        <div class="comparison-value tiktok-color">TikTok</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Total Views</div>
+                        <div class="comparison-value">119.9K</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Average Views</div>
+                        <div class="comparison-value">2,306</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Engagement Rate</div>
+                        <div class="comparison-value">0.65%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Daily Trend Charts -->
+            <div class="chart-container">
+                <h2 class="chart-title">Daily Posts & Performance Trends</h2>
+                <div id="dailyTrendChart" class="chart"></div>
+            </div>
+            
+            <div class="two-column">
+                <!-- Account Performance Ranking -->
+                <div class="chart-container">
+                    <h2 class="chart-title">Account Views Ranking</h2>
+                    <div id="accountPerformanceChart" class="chart-small"></div>
+                </div>
+                
+                <!-- Account Engagement Rate Comparison -->
+                <div class="chart-container">
+                    <h2 class="chart-title">Account Engagement Rate Analysis</h2>
+                    <div id="engagementRateChart" class="chart-small"></div>
+                </div>
+            </div>
+            
+            <!-- Top 10 Best Performing Content -->
+            <div class="top-posts-table">
+                <h2 class="chart-title">Best Performing Content TOP 10</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Account</th>
+                            <th>Views</th>
+                            <th>Likes</th>
+                            <th>Comments</th>
+                            <th>Engagement Rate</th>
+                            <th>Post Date</th>
+                            <th>Performance Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topPostsTable">
+                        <!-- Dynamically Generated -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Insights & Recommendations -->
+            <div class="insights-section">
+                <h2 style="font-size: 1.8em; margin-bottom: 20px;">💡 Key Insights & Optimization Recommendations</h2>
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <h3>📈 Platform Strategy Optimization</h3>
+                        <p>Instagram's overall performance is lower than TikTok (44% fewer views, 0.11% lower engagement rate). Recommend allocating more resources to TikTok while optimizing Instagram content strategy by using more Reels short video formats.</p>
+                    </div>
+                    <div class="insight-card">
+                        <h3>🎯 Differentiated Account Operations</h3>
+                        <p>@dinomcmahan has the highest views but @moorebenjaminu24do has better engagement rate (0.79%). Recommend studying high engagement content characteristics, such as using more interactive stickers, Q&A features, etc.</p>
+                    </div>
+                    <div class="insight-card">
+                        <h3>⚠️ Problematic Account Rectification</h3>
+                        <p>@barrettagnesghmbq has high views but only 0.19% engagement rate, @lancetorres81998 averages only 171 views. Recommend reassessing content quality, considering account repositioning or resource reallocation.</p>
+                    </div>
+                    <div class="insight-card">
+                        <h3>📅 Posting Time Optimization</h3>
+                        <p>July 6 (Sunday) achieved highest views (20,123), while weekdays performed weaker. Recommend increasing weekend content delivery to capitalize on Instagram users' weekend activity patterns.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account Efficiency Analysis -->
+            <div class="chart-container">
+                <h2 class="chart-title">Account Efficiency Matrix Analysis</h2>
+                <div id="efficiencyChart" class="chart"></div>
+            </div>
+            
+            <!-- Content Type Distribution -->
+            <div class="chart-container">
+                <h2 class="chart-title">View Distribution & Contribution</h2>
+                <div id="contributionChart" class="chart-small"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data Preparation
+        const accountData = {
+            "dinomcmahan": {"posts": 5, "totalViews": 21208, "totalLikes": 150, "totalComments": 9, "engagementRate": "0.75"},
+            "barrettagnesghmbq": {"posts": 6, "totalViews": 15464, "totalLikes": 29, "totalComments": 0, "engagementRate": "0.19"},
+            "moorebenjaminu24do": {"posts": 7, "totalViews": 15247, "totalLikes": 120, "totalComments": 0, "engagementRate": "0.79"},
+            "davidsonmaxqwsf": {"posts": 7, "totalViews": 5866, "totalLikes": 22, "totalComments": 0, "engagementRate": "0.38"},
+            "grantgusellafkni9": {"posts": 7, "totalViews": 4596, "totalLikes": 16, "totalComments": 0, "engagementRate": "0.35"},
+            "careybenjaminqefz0": {"posts": 5, "totalViews": 3970, "totalLikes": 17, "totalComments": 1, "engagementRate": "0.45"},
+            "lancetorres81998": {"posts": 6, "totalViews": 1027, "totalLikes": 3, "totalComments": 0, "engagementRate": "0.29"}
+        };
+        
+        const dailyData = {
+            "2025/7/2": {"posts": 7, "views": 4058, "likes": 10, "comments": 0},
+            "2025/7/3": {"posts": 7, "views": 9401, "likes": 37, "comments": 2},
+            "2025/7/4": {"posts": 5, "views": 5716, "likes": 12, "comments": 0},
+            "2025/7/6": {"posts": 7, "views": 20123, "likes": 118, "comments": 6},
+            "2025/7/7": {"posts": 7, "views": 9296, "likes": 102, "comments": 1},
+            "2025/7/8": {"posts": 7, "views": 16886, "likes": 72, "comments": 1},
+            "2025/7/9": {"posts": 3, "views": 1898, "likes": 6, "comments": 0}
+        };
+        
+        const topPosts = [
+            {rank: 1, username: "@dinomcmahan", views: 9526, likes: 87, comments: 6, date: "2025/7/6"},
+            {rank: 2, username: "@barrettagnesghmbq", views: 6349, likes: 13, comments: 0, date: "2025/7/8"},
+            {rank: 3, username: "@moorebenjaminu24do", views: 4821, likes: 23, comments: 0, date: "2025/7/8"},
+            {rank: 4, username: "@dinomcmahan", views: 4097, likes: 19, comments: 1, date: "2025/7/3"},
+            {rank: 5, username: "@dinomcmahan", views: 3849, likes: 29, comments: 1, date: "2025/7/8"},
+            {rank: 6, username: "@dinomcmahan", views: 2991, likes: 13, comments: 1, date: "2025/7/7"},
+            {rank: 7, username: "@moorebenjaminu24do", views: 2960, likes: 71, comments: 0, date: "2025/7/7"},
+            {rank: 8, username: "@barrettagnesghmbq", views: 2561, likes: 7, comments: 0, date: "2025/7/6"},
+            {rank: 9, username: "@grantgusellafkni9", views: 2331, likes: 5, comments: 0, date: "2025/7/6"},
+            {rank: 10, username: "@moorebenjaminu24do", views: 2297, likes: 9, comments: 0, date: "2025/7/6"}
+        ];
+        
+        // Initialize Charts
+        function initCharts() {
+            // 1. Daily Trend Chart
+            const dailyTrendChart = echarts.init(document.getElementById('dailyTrendChart'));
+            const dates = Object.keys(dailyData).sort();
+            
+            dailyTrendChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                legend: {
+                    data: ['Posts', 'Views', 'Engagement']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: dates.map(d => d.split('/')[1] + '/' + d.split('/')[2])
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Posts/Engagement',
+                        position: 'left'
+                    },
+                    {
+                        type: 'value',
+                        name: 'Views',
+                        position: 'right'
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Posts',
+                        type: 'bar',
+                        data: dates.map(d => dailyData[d].posts),
+                        itemStyle: {
+                            color: '#E1306C'
+                        }
+                    },
+                    {
+                        name: 'Views',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: dates.map(d => dailyData[d].views),
+                        smooth: true,
+                        itemStyle: {
+                            color: '#F77737'
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(247, 119, 55, 0.3)' },
+                                { offset: 1, color: 'rgba(247, 119, 55, 0.1)' }
+                            ])
+                        }
+                    },
+                    {
+                        name: 'Engagement',
+                        type: 'line',
+                        data: dates.map(d => dailyData[d].likes + dailyData[d].comments),
+                        smooth: true,
+                        itemStyle: {
+                            color: '#833ab4'
+                        }
+                    }
+                ]
+            });
+            
+            // 2. Account Performance Ranking
+            const accountPerformanceChart = echarts.init(document.getElementById('accountPerformanceChart'));
+            const accounts = Object.keys(accountData).sort((a, b) => accountData[b].totalViews - accountData[a].totalViews);
+            
+            accountPerformanceChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: function(value) {
+                            return value >= 1000 ? (value / 1000).toFixed(1) + 'K' : value;
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: accounts,
+                    axisLabel: {
+                        fontSize: 10
+                    }
+                },
+                series: [
+                    {
+                        type: 'bar',
+                        data: accounts.map(a => accountData[a].totalViews),
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                                { offset: 0, color: '#E1306C' },
+                                { offset: 0.5, color: '#F77737' },
+                                { offset: 1, color: '#FCAF45' }
+                            ])
+                        },
+                        label: {
+                            show: true,
+                            position: 'right',
+                            formatter: function(params) {
+                                return params.value >= 1000 ? (params.value / 1000).toFixed(1) + 'K' : params.value;
+                            }
+                        }
+                    }
+                ]
+            });
+            
+            // 3. Account Engagement Rate Comparison
+            const engagementRateChart = echarts.init(document.getElementById('engagementRateChart'));
+            
+            engagementRateChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    formatter: function(params) {
+                        return params[0].name + '<br/>' +
+                               'Engagement Rate: ' + params[0].value + '%<br/>' +
+                               'Views: ' + accountData[params[0].name].totalViews;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: accounts,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Engagement Rate (%)',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: [
+                    {
+                        type: 'bar',
+                        data: accounts.map(a => parseFloat(accountData[a].engagementRate)),
+                        itemStyle: {
+                            color: function(params) {
+                                const value = params.value;
+                                if (value >= 0.7) return '#10b981';
+                                else if (value >= 0.5) return '#833ab4';
+                                else if (value >= 0.3) return '#f59e0b';
+                                else return '#ef4444';
+                            }
+                        },
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: '{c}%'
+                        }
+                    }
+                ]
+            });
+            
+            // 4. Efficiency Matrix Chart
+            const efficiencyChart = echarts.init(document.getElementById('efficiencyChart'));
+            
+            const scatterData = Object.entries(accountData).map(([username, stats]) => ({
+                name: username,
+                value: [
+                    Math.round(stats.totalViews / stats.posts), // Average views
+                    parseFloat(stats.engagementRate), // Engagement rate
+                    stats.totalViews // Used for bubble size
+                ]
+            }));
+            
+            efficiencyChart.setOption({
+                title: {
+                    text: 'High Views + High Engagement = Best Account',
+                    left: 'center',
+                    top: 10,
+                    textStyle: {
+                        fontSize: 14,
+                        color: '#666'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    name: 'Average Views',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    splitLine: {
+                        lineStyle: {
+                            type: 'dashed'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Engagement Rate (%)',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    splitLine: {
+                        lineStyle: {
+                            type: 'dashed'
+                        }
+                    }
+                },
+                tooltip: {
+                    formatter: function(params) {
+                        return params.name + '<br/>' +
+                               'Average Views: ' + params.value[0] + '<br/>' +
+                               'Engagement Rate: ' + params.value[1] + '%<br/>' +
+                               'Total Views: ' + params.value[2];
+                    }
+                },
+                series: [{
+                    type: 'scatter',
+                    data: scatterData,
+                    symbolSize: function (val) {
+                        return Math.sqrt(val[2]) / 5;
+                    },
+                    itemStyle: {
+                        color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [{
+                            offset: 0,
+                            color: 'rgba(225, 48, 108, 0.8)'
+                        }, {
+                            offset: 1,
+                            color: 'rgba(252, 175, 69, 0.8)'
+                        }])
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}',
+                        position: 'top'
+                    }
+                }]
+            });
+            
+            // 5. Contribution Pie Chart
+            const contributionChart = echarts.init(document.getElementById('contributionChart'));
+            
+            contributionChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    textStyle: {
+                        fontSize: 10
+                    }
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        center: ['60%', '50%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: true,
+                            formatter: '{d}%'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: 16,
+                                fontWeight: 'bold'
+                            }
+                        },
+                        data: Object.entries(accountData).map(([name, stats]) => ({
+                            name: name,
+                            value: stats.totalViews
+                        })).sort((a, b) => b.value - a.value)
+                    }
+                ]
+            });
+            
+            // Responsive Handling
+            window.addEventListener('resize', function() {
+                dailyTrendChart.resize();
+                accountPerformanceChart.resize();
+                engagementRateChart.resize();
+                efficiencyChart.resize();
+                contributionChart.resize();
+            });
+        }
+        
+        // Fill Top 10 Table
+        function fillTopPostsTable() {
+            const tbody = document.getElementById('topPostsTable');
+            topPosts.forEach(post => {
+                const engagementRate = ((post.likes + post.comments) / post.views * 100).toFixed(2);
+                const performanceClass = engagementRate >= 1.0 ? 'badge-excellent' : 
+                                        engagementRate >= 0.7 ? 'badge-good' : 
+                                        engagementRate >= 0.4 ? 'badge-average' : 'badge-poor';
+                const performanceText = engagementRate >= 1.0 ? 'Excellent' : 
+                                        engagementRate >= 0.7 ? 'Good' : 
+                                        engagementRate >= 0.4 ? 'Average' : 'Poor';
+                
+                const row = `
+                    <tr>
+                        <td>${post.rank}</td>
+                        <td><span class="account-badge">${post.username}</span></td>
+                        <td>${post.views.toLocaleString()}</td>
+                        <td>${post.likes}</td>
+                        <td>${post.comments}</td>
+                        <td>${engagementRate}%</td>
+                        <td>${post.date}</td>
+                        <td><span class="performance-badge ${performanceClass}">${performanceText}</span></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            fillTopPostsTable();
+        });
+    </script>
+</body>
+</html>
