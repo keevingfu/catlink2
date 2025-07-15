@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catlink FaceBook Ad Campaign Performance</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .chart-container {
+            height: 350px;
+            width: 100%;
+        }
+
+        .small-chart-container {
+            height: 250px;
+            width: 100%;
+        }
+
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-active {
+            color: #3B82F6;
+            border-bottom: 2px solid #3B82F6;
+        }
+
+        .bg-catlink {
+            background-color: #3B82F6;
+        }
+
+        .text-catlink {
+            color: #3B82F6;
+        }
+
+        .bg-facebook {
+            background-color: #1877F2;
+        }
+
+        .text-facebook {
+            color: #1877F2;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-900">Catlink FaceBook Ad Campaign Performance</h1>
+            <div class="text-sm text-gray-500">Data period: May 1-13, 2025</div>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button id="overview-tab" class="tab-active px-1 py-4 text-sm font-medium text-gray-900 whitespace-nowrap focus:outline-none">
+                    Campaign Overview
+                </button>
+                <button id="facebook-tab" class="px-1 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap focus:outline-none">
+                    Ad Performance
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Dashboard Sections -->
+        <div id="overview-section">
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Spend -->
+                <div class="bg-white rounded-lg shadow p-6 metric-card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 truncate">Total Ad Spend</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-1">$438.34</p>
+                        </div>
+                        <div class="rounded-md bg-blue-50 p-2">
+                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-sm text-gray-500">
+                            <span>43.2% on lowest performer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Revenue -->
+                <div class="bg-white rounded-lg shadow p-6 metric-card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 truncate">Total Revenue</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-1">$1,158.63</p>
+                        </div>
+                        <div class="rounded-md bg-green-50 p-2">
+                            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-sm text-gray-500">
+                            <span>54.2% from top performer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overall ROAS -->
+                <div class="bg-white rounded-lg shadow p-6 metric-card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 truncate">Overall ROAS</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-1">2.64×</p>
+                        </div>
+                        <div class="rounded-md bg-indigo-50 p-2">
+                            <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-sm text-gray-500">
+                            <span>Potential to increase to 5.1-6.3×</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Impressions -->
+                <div class="bg-white rounded-lg shadow p-6 metric-card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 truncate">Total Impressions</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-1">32,279</p>
+                        </div>
+                        <div class="rounded-md bg-yellow-50 p-2">
+                            <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-sm text-gray-500">
+                            <span>Avg. frequency: 2.09 views per user</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- ROAS by Ad Creative -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">ROAS by Ad Creative</h2>
+                    <div id="roas-chart" class="chart-container"></div>
+                </div>
+
+                <!-- Engagement Metrics -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Engagement Metrics</h2>
+                    <div id="ctr-chart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Cost Metrics -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Cost Metrics Analysis</h2>
+                    <div id="cost-metrics-chart" class="chart-container"></div>
+                </div>
+
+                <!-- Budget Allocation -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Budget Allocation</h2>
+                    <div id="budget-chart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- Performance Table -->
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+                <div class="px-6 py-5 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">Ad Creative Performance Comparison</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ad Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Spend</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Impressions</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CTR</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CPC</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROAS</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recommendation</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Flexi</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$76.48</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4,616</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1.36%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$1.21</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$628.00</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">8.21×</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                                    <span class="px-2 py-1 rounded bg-green-500">Increase 200%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">catcalledotto</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$114.28</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">7,420</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1.85%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$0.83</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$380.65</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">3.33×</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                                    <span class="px-2 py-1 rounded bg-blue-500">Maintain</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">lv_0_20250227163202</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$189.55</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">16,481</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1.13%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$1.02</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$149.98</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600">0.79×</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                                    <span class="px-2 py-1 rounded bg-yellow-500">Reduce 75%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">lv_0_20250322143536</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$58.03</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3,762</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0.80%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$1.93</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">N/A</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">N/A</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                                    <span class="px-2 py-1 rounded bg-red-500">Pause</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Facebook Section (hidden by default) -->
+        <div id="facebook-section" class="hidden">
+            <!-- Facebook KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Average ROAS -->
+                <div class="bg-white rounded-lg shadow p-6 metric-card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 truncate">Average ROAS</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-1">4.11×</p>
+                        </div>
+                        <div class="rounded-md bg-blue-50 p-2">
+                            <svg class="w-6 h-6 text-facebook" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-sm text-gray-500">
+                            <span>Website Purchases</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Best Performing Ad -->
+                <div class="bg-white rounded-lg shadow p-6 metric-card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 truncate">Best Performing Ad</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-1">8.21×</p>
+                        </div>
+                        <div class="rounded-md bg-green-50 p-2">
+                            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-sm text-gray-500">
+                            <span>ROAS for Ad 3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lowest Cost per Result -->
+                <div class="bg-white rounded-lg shadow p-6 metric-card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 truncate">Lowest Cost per Result</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-1">$38.24</p>
+                        </div>
+                        <div class="rounded-md bg-indigo-50 p-2">
+                            <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-sm text-gray-500">
+                            <span>Ad 3 cost per conversion</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Variance -->
+                <div class="bg-white rounded-lg shadow p-6 metric-card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 truncate">Performance Variance</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-1">10.38×</p>
+                        </div>
+                        <div class="rounded-md bg-yellow-50 p-2">
+                            <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-sm text-gray-500">
+                            <span>Best vs worst conversion efficiency</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- ROAS Chart -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Return on Ad Spend (ROAS) by Ad</h2>
+                    <div id="fb-roas-chart" class="chart-container"></div>
+                </div>
+
+                <!-- Cost per Result Chart -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Cost per Website Purchase by Ad</h2>
+                    <div id="fb-cost-chart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- ROAS vs Cost Analysis -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">ROAS vs Cost Analysis</h2>
+                    <div id="fb-efficiency-chart" class="chart-container"></div>
+                </div>
+
+                <!-- ROI Gauge Chart -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Ad Performance Gauge</h2>
+                    <div id="fb-gauge-chart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- Facebook Performance Table -->
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+                <div class="px-6 py-5 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">Facebook Ad Performance Details</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ad Identifier</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROAS</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result Type</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost per Result</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Performance Level</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Ad 1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0.79×</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Website purchases</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$94.78</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-white rounded bg-red-500">Low</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Ad 2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3.33×</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Website purchases</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$114.28</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-white rounded bg-blue-500">Average</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Ad 3</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8.21×</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Website purchases</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$38.24</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-white rounded bg-green-500">Excellent</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Ad 4</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">N/A</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Website purchases</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">N/A</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 py-1 text-white rounded bg-gray-500">No Data</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations Section - always visible -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Strategic Recommendations</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Budget Reallocation -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-4">
+                        <div class="rounded-full bg-blue-100 p-2 mr-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-md font-medium text-gray-900">Budget Reallocation</h3>
+                    </div>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Increase "Flexi"/Ad 3 budget by 200%
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Maintain "catcalledotto"/Ad 2 budget
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Reduce "lv_0_20250227163202"/Ad 1 budget by 75%
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Pause "lv_0_20250322143536"/Ad 4 for investigation
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Creative Optimization -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-4">
+                        <div class="rounded-full bg-purple-100 p-2 mr-3">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-md font-medium text-gray-900">Creative Optimization</h3>
+                    </div>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Analyze "Flexi"/Ad 3 creative elements
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Create 3-5 new variations based on best performing ads
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Test different audience segments with top performers
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Implement descriptive ad naming conventions
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- ROI Projection -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-4">
+                        <div class="rounded-full bg-green-100 p-2 mr-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-md font-medium text-gray-900">ROI Projection</h3>
+                    </div>
+                    <div id="roi-projection-chart" class="small-chart-container"></div>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-blue-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Current Overall ROAS: 2.64×
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Projected ROAS with optimization: 5.1-6.3×
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Potential revenue increase: 93-138%
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <p class="text-sm text-gray-500 text-center">Catlink Content-Driven Intelligent Growth Decision System | Generated on May 14, 2025</p>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching functionality
+        document.getElementById('overview-tab').addEventListener('click', function() {
+            document.getElementById('overview-tab').classList.add('tab-active');
+            document.getElementById('facebook-tab').classList.remove('tab-active');
+            document.getElementById('overview-section').classList.remove('hidden');
+            document.getElementById('facebook-section').classList.add('hidden');
+            document.getElementById('facebook-tab').classList.add('text-gray-500');
+            document.getElementById('facebook-tab').classList.remove('text-gray-900');
+            document.getElementById('overview-tab').classList.add('text-gray-900');
+            document.getElementById('overview-tab').classList.remove('text-gray-500');
+
+            // Resize charts after tab switch (in case window size changed while tab was hidden)
+            setTimeout(function() {
+                roasChart.resize();
+                ctrChart.resize();
+                costMetricsChart.resize();
+                budgetChart.resize();
+                roiProjectionChart.resize();
+            }, 100);
+        });
+
+        document.getElementById('facebook-tab').addEventListener('click', function() {
+            document.getElementById('facebook-tab').classList.add('tab-active');
+            document.getElementById('overview-tab').classList.remove('tab-active');
+            document.getElementById('facebook-section').classList.remove('hidden');
+            document.getElementById('overview-section').classList.add('hidden');
+            document.getElementById('overview-tab').classList.add('text-gray-500');
+            document.getElementById('overview-tab').classList.remove('text-gray-900');
+            document.getElementById('facebook-tab').classList.add('text-gray-900');
+            document.getElementById('facebook-tab').classList.remove('text-gray-500');
+
+            // Resize charts after tab switch
+            setTimeout(function() {
+                fbRoasChart.resize();
+                fbCostChart.resize();
+                fbEfficiencyChart.resize();
+                fbGaugeChart.resize();
+            }, 100);
+        });
+
+        // Initialize ECharts instances - Overview Tab
+        const roasChart = echarts.init(document.getElementById('roas-chart'));
+        const ctrChart = echarts.init(document.getElementById('ctr-chart'));
+        const costMetricsChart = echarts.init(document.getElementById('cost-metrics-chart'));
+        const budgetChart = echarts.init(document.getElementById('budget-chart'));
+        const roiProjectionChart = echarts.init(document.getElementById('roi-projection-chart'));
+
+        // Initialize ECharts instances - Facebook Tab
+        const fbRoasChart = echarts.init(document.getElementById('fb-roas-chart'));
+        const fbCostChart = echarts.init(document.getElementById('fb-cost-chart'));
+        const fbEfficiencyChart = echarts.init(document.getElementById('fb-efficiency-chart'));
+        const fbGaugeChart = echarts.init(document.getElementById('fb-gauge-chart'));
+
+        // ROAS Chart - Overview
+        const roasOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                formatter: '{b}: {c}×'
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Flexi', 'catcalledotto', 'lv_0_20250227163202', 'lv_0_20250322143536'],
+                axisLabel: {
+                    interval: 0,
+                    rotate: 0,
+                    formatter: function(value) {
+                        if (value.length > 10) {
+                            return value.substring(0, 8) + '...';
+                        }
+                        return value;
+                    }
+                }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'ROAS',
+                nameTextStyle: {
+                    padding: [0, 0, 0, 50]
+                },
+                axisLabel: {
+                    formatter: '{value}×'
+                }
+            },
+            series: [{
+                name: 'ROAS',
+                data: [8.21, 3.33, 0.79, 0],
+                type: 'bar',
+                itemStyle: {
+                    color: function(params) {
+                        const colorList = ['#34D399', '#60A5FA', '#F87171', '#9CA3AF'];
+                        return colorList[params.dataIndex];
+                    }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}×'
+                }
+            }]
+        };
+
+        // Engagement Metrics Chart - Overview
+        const ctrOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: ['CTR', 'Frequency'],
+                top: 10
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Flexi', 'catcalledotto', 'lv_0_20250227163202', 'lv_0_20250322143536'],
+                axisLabel: {
+                    interval: 0,
+                    rotate: 0,
+                    formatter: function(value) {
+                        if (value.length > 10) {
+                            return value.substring(0, 8) + '...';
+                        }
+                        return value;
+                    }
+                }
+            },
+            yAxis: [{
+                    type: 'value',
+                    name: 'CTR',
+                    min: 0,
+                    max: 2,
+                    interval: 0.5,
+                    position: 'left',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                {
+                    type: 'value',
+                    name: 'Frequency',
+                    min: 0,
+                    max: 3,
+                    interval: 0.5,
+                    position: 'right',
+                    axisLabel: {
+                        formatter: '{value}'
+                    }
+                }
+            ],
+            series: [{
+                    name: 'CTR',
+                    type: 'bar',
+                    data: [1.36, 1.85, 1.13, 0.80],
+                    yAxisIndex: 0,
+                    itemStyle: {
+                        color: '#3B82F6'
+                    },
+                    label: {
+                        show: true,
+                        position: 'top',
+                        formatter: '{c}%'
+                    }
+                },
+                {
+                    name: 'Frequency',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    data: [2.53, 2.52, 1.88, 2.00],
+                    itemStyle: {
+                        color: '#F59E0B'
+                    },
+                    label: {
+                        show: true,
+                        position: 'top'
+                    }
+                }
+            ]
+        };
+
+        // Cost Metrics Chart - Overview
+        const costMetricsOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: ['CPM', 'CPC', 'Cost per Purchase'],
+                top: 10,
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                top: 60,
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Flexi', 'catcalledotto', 'lv_0_20250227163202', 'lv_0_20250322143536'],
+                axisLabel: {
+                    interval: 0,
+                    rotate: 0,
+                    formatter: function(value) {
+                        if (value.length > 10) {
+                            return value.substring(0, 8) + '...';
+                        }
+                        return value;
+                    }
+                }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'USD',
+                axisLabel: {
+                    formatter: '${value}'
+                }
+            },
+            series: [{
+                    name: 'CPM',
+                    type: 'bar',
+                    stack: 'metrics',
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: [16.57, 15.40, 11.50, 15.43]
+                },
+                {
+                    name: 'CPC',
+                    type: 'bar',
+                    stack: 'metrics',
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: [1.21, 0.83, 1.02, 1.93]
+                },
+                {
+                    name: 'Cost per Purchase',
+                    type: 'bar',
+                    stack: 'metrics',
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: [38.24, 114.28, 94.78, 0]
+                }
+            ]
+        };
+
+        // Budget Allocation Chart - Overview
+        const budgetOption = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}: ${c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['Flexi', 'catcalledotto', 'lv_0_20250227163202', 'lv_0_20250322143536']
+            },
+            series: [{
+                name: 'Budget Allocation',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '16',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [{
+                        value: 76.48,
+                        name: 'Flexi'
+                    },
+                    {
+                        value: 114.28,
+                        name: 'catcalledotto'
+                    },
+                    {
+                        value: 189.55,
+                        name: 'lv_0_20250227163202'
+                    },
+                    {
+                        value: 58.03,
+                        name: 'lv_0_20250322143536'
+                    }
+                ]
+            }]
+        };
+
+        // ROI Projection Chart - Common
+        const roiProjectionOption = {
+            tooltip: {
+                trigger: 'axis',
+                formatter: '{b}: {c}×'
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '10%',
+                top: '10%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Current ROAS', 'Projected Min', 'Projected Max']
+            },
+            yAxis: {
+                type: 'value',
+                name: 'ROAS',
+                axisLabel: {
+                    formatter: '{value}×'
+                }
+            },
+            series: [{
+                data: [{
+                        value: 2.64,
+                        itemStyle: {
+                            color: '#9CA3AF'
+                        }
+                    },
+                    {
+                        value: 5.1,
+                        itemStyle: {
+                            color: '#60A5FA'
+                        }
+                    },
+                    {
+                        value: 6.3,
+                        itemStyle: {
+                            color: '#34D399'
+                        }
+                    }
+                ],
+                type: 'bar',
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}×'
+                }
+            }]
+        };
+
+        // ROAS Chart - Facebook
+        const fbRoasOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                formatter: '{b}: {c}×'
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Ad 1', 'Ad 2', 'Ad 3', 'Ad 4'],
+            },
+            yAxis: {
+                type: 'value',
+                name: 'ROAS',
+                nameTextStyle: {
+                    padding: [0, 0, 0, 50]
+                },
+                axisLabel: {
+                    formatter: '{value}×'
+                }
+            },
+            series: [{
+                name: 'ROAS',
+                data: [{
+                        value: 0.79,
+                        itemStyle: {
+                            color: '#F87171'
+                        }
+                    },
+                    {
+                        value: 3.33,
+                        itemStyle: {
+                            color: '#60A5FA'
+                        }
+                    },
+                    {
+                        value: 8.21,
+                        itemStyle: {
+                            color: '#34D399'
+                        }
+                    },
+                    {
+                        value: 0,
+                        itemStyle: {
+                            color: '#9CA3AF'
+                        }
+                    }
+                ],
+                type: 'bar',
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}×'
+                }
+            }]
+        };
+
+        // Cost per Result Chart - Facebook
+        const fbCostOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                formatter: '{b}: ${c}'
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Ad 1', 'Ad 2', 'Ad 3', 'Ad 4'],
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Cost per Purchase',
+                nameTextStyle: {
+                    padding: [0, 0, 0, 50]
+                },
+                axisLabel: {
+                    formatter: '${value}'
+                }
+            },
+            series: [{
+                name: 'Cost per Result',
+                data: [{
+                        value: 94.78,
+                        itemStyle: {
+                            color: '#F87171'
+                        }
+                    },
+                    {
+                        value: 114.28,
+                        itemStyle: {
+                            color: '#F59E0B'
+                        }
+                    },
+                    {
+                        value: 38.24,
+                        itemStyle: {
+                            color: '#34D399'
+                        }
+                    },
+                    {
+                        value: 0,
+                        itemStyle: {
+                            color: '#9CA3AF'
+                        }
+                    }
+                ],
+                type: 'bar',
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '${c}'
+                }
+            }]
+        };
+
+        // ROAS vs Cost Analysis - Facebook
+        const fbEfficiencyOption = {
+            tooltip: {
+                formatter: function(params) {
+                    return params.data[2] + '<br/>' +
+                        'ROAS: ' + params.data[0] + '×<br/>' +
+                        'Cost: $' + params.data[1];
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                name: 'ROAS',
+                axisLabel: {
+                    formatter: '{value}×'
+                }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Cost per Purchase',
+                axisLabel: {
+                    formatter: '${value}'
+                }
+            },
+            series: [{
+                type: 'scatter',
+                symbolSize: function(data) {
+                    // Dynamic size based on efficiency
+                    return data[0] > 0 ? (20 + data[0] * 3) : 20;
+                },
+                data: [
+                    [0.79, 94.78, 'Ad 1'],
+                    [3.33, 114.28, 'Ad 2'],
+                    [8.21, 38.24, 'Ad 3'],
+                    [0, 0, 'Ad 4 (No Data)']
+                ],
+                itemStyle: {
+                    color: function(params) {
+                        const colors = ['#F87171', '#60A5FA', '#34D399', '#9CA3AF'];
+                        return colors[params.dataIndex];
+                    }
+                },
+                label: {
+                    show: true,
+                    formatter: '{c}',
+                    position: 'top'
+                }
+            }]
+        };
+
+        // Gauge Chart - Facebook
+        const fbGaugeOption = {
+            series: [{
+                type: 'gauge',
+                startAngle: 180,
+                endAngle: 0,
+                min: 0,
+                max: 10,
+                splitNumber: 5,
+                axisLine: {
+                    lineStyle: {
+                        width: 30,
+                        color: [
+                            [0.2, '#F87171'],
+                            [0.5, '#FBBF24'],
+                            [0.8, '#60A5FA'],
+                            [1, '#34D399']
+                        ]
+                    }
+                },
+                pointer: {
+                    icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
+                    length: '12%',
+                    width: 20,
+                    offsetCenter: [0, '-60%'],
+                    itemStyle: {
+                        color: 'inherit'
+                    }
+                },
+                axisTick: {
+                    length: 12,
+                    lineStyle: {
+                        color: 'auto',
+                        width: 2
+                    }
+                },
+                splitLine: {
+                    length: 20,
+                    lineStyle: {
+                        color: 'auto',
+                        width: 5
+                    }
+                },
+                axisLabel: {
+                    color: '#464646',
+                    fontSize: 12,
+                    distance: -60,
+                    formatter: function(value) {
+                        if (value === 0) {
+                            return 'Poor';
+                        } else if (value === 2.5) {
+                            return 'Below Average';
+                        } else if (value === 5) {
+                            return 'Average';
+                        } else if (value === 7.5) {
+                            return 'Good';
+                        } else if (value === 10) {
+                            return 'Excellent';
+                        }
+                        return '';
+                    }
+                },
+                title: {
+                    offsetCenter: [0, '-10%'],
+                    fontSize: 14
+                },
+                detail: {
+                    fontSize: 30,
+                    offsetCenter: [0, '30%'],
+                    valueAnimation: true,
+                    formatter: function(value) {
+                        return value.toFixed(2) + '×';
+                    },
+                    color: 'inherit'
+                },
+                data: [{
+                    value: 4.11,
+                    name: 'Average ROAS'
+                }]
+            }]
+        };
+
+        // Set options for charts - Overview Tab
+        roasChart.setOption(roasOption);
+        ctrChart.setOption(ctrOption);
+        costMetricsChart.setOption(costMetricsOption);
+        budgetChart.setOption(budgetOption);
+        roiProjectionChart.setOption(roiProjectionOption);
+
+        // Set options for charts - Facebook Tab
+        fbRoasChart.setOption(fbRoasOption);
+        fbCostChart.setOption(fbCostOption);
+        fbEfficiencyChart.setOption(fbEfficiencyOption);
+        fbGaugeChart.setOption(fbGaugeOption);
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            // Resize visible charts based on current tab
+            if (!document.getElementById('overview-section').classList.contains('hidden')) {
+                roasChart.resize();
+                ctrChart.resize();
+                costMetricsChart.resize();
+                budgetChart.resize();
+            }
+
+            if (!document.getElementById('facebook-section').classList.contains('hidden')) {
+                fbRoasChart.resize();
+                fbCostChart.resize();
+                fbEfficiencyChart.resize();
+                fbGaugeChart.resize();
+            }
+
+            // Always resize common chart
+            roiProjectionChart.resize();
+        });
+    </script>
+</body>
+
+</html>

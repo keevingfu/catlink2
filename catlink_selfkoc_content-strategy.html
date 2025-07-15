@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catlink Content Strategy Dashboard - Smart Litter Box Campaign</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-wordcloud@2.1.0/dist/echarts-wordcloud.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .segment-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .segment-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .segment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .segment-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--segment-color) 0%, transparent 100%);
+        }
+
+        .segment-card:nth-child(1) { --segment-color: #FF6B6B; border-top-color: #FF6B6B; }
+        .segment-card:nth-child(2) { --segment-color: #4ECDC4; border-top-color: #4ECDC4; }
+        .segment-card:nth-child(3) { --segment-color: #45B7D1; border-top-color: #45B7D1; }
+        .segment-card:nth-child(4) { --segment-color: #96CEB4; border-top-color: #96CEB4; }
+        .segment-card:nth-child(5) { --segment-color: #FECA57; border-top-color: #FECA57; }
+        .segment-card:nth-child(6) { --segment-color: #DDA0DD; border-top-color: #DDA0DD; }
+        .segment-card:nth-child(7) { --segment-color: #FFA07A; border-top-color: #FFA07A; }
+
+        .segment-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .segment-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .segment-desc {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .segment-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--segment-color);
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .chart-header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-header h2 {
+            font-size: 1.5em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .chart {
+            height: 400px;
+        }
+
+        .insights-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+        }
+
+        .insights-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .insights-header h2 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .insight-card {
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .insight-card:nth-child(1) { border-left-color: #FF6B6B; }
+        .insight-card:nth-child(2) { border-left-color: #4ECDC4; }
+        .insight-card:nth-child(3) { border-left-color: #45B7D1; }
+        .insight-card:nth-child(4) { border-left-color: #96CEB4; }
+
+        .insight-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .insight-content {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .recommendation {
+            background: #e3f5ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            color: #0277bd;
+            font-size: 0.95em;
+        }
+
+        .keyword-cloud {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+        }
+
+        .tag-analysis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .tag-category {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .tag-category h4 {
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            padding: 5px 12px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .segment-overview {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Catlink Smart Litter Box Content Strategy</h1>
+            <p>Target Audience Analysis & Content Campaign Planning</p>
+        </div>
+
+        <div class="segment-overview">
+            <div class="segment-card">
+                <div class="segment-icon">💼</div>
+                <div class="segment-title">Busy Professionals</div>
+                <div class="segment-desc">Time-conscious individuals seeking automated pet care solutions for their fast-paced lifestyle.</div>
+                <div class="segment-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Keywords</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Key Features</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="segment-card">
+                <div class="segment-icon">❤️</div>
+                <div class="segment-title">Health-Conscious Owners</div>
+                <div class="segment-desc">Pet parents focused on monitoring and maintaining their cat's health through smart technology.</div>
+                <div class="segment-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Keywords</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Key Features</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="segment-card">
+                <div class="segment-icon">🏢</div>
+                <div class="segment-title">Apartment Dwellers</div>
+                <div class="segment-desc">Urban residents needing space-efficient, odor-free solutions for their limited living space.</div>
+                <div class="segment-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Keywords</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1</div>
+                        <div class="stat-label">Key Feature</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="segment-card">
+                <div class="segment-icon">👴</div>
+                <div class="segment-title">Senior Pet Owners</div>
+                <div class="segment-desc">Elderly individuals seeking easy-to-use solutions that eliminate physical strain.</div>
+                <div class="segment-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">9</div>
+                        <div class="stat-label">Keywords</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Key Features</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="segment-card">
+                <div class="segment-icon">🏠</div>
+                <div class="segment-title">Smart Home Users</div>
+                <div class="segment-desc">Tech enthusiasts integrating pet care into their connected home ecosystem.</div>
+                <div class="segment-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Keywords</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Key Features</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="segment-card">
+                <div class="segment-icon">🏥</div>
+                <div class="segment-title">Pet Professionals</div>
+                <div class="segment-desc">Veterinarians and pet care businesses needing professional health monitoring solutions.</div>
+                <div class="segment-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">9</div>
+                        <div class="stat-label">Keywords</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Key Features</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="segment-card">
+                <div class="segment-icon">👨‍👩‍👧</div>
+                <div class="segment-title">Young Families</div>
+                <div class="segment-desc">New parents balancing pet care with family responsibilities.</div>
+                <div class="segment-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Keywords</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1</div>
+                        <div class="stat-label">Key Feature</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Feature Emphasis by Target Segment</h2>
+                </div>
+                <div id="featureRadar" class="chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Keyword Strategy Distribution</h2>
+                </div>
+                <div id="keywordSankey" class="chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Content Strategy Focus Areas</h2>
+                </div>
+                <div id="contentPie" class="chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Messaging Tone & Appeal Analysis</h2>
+                </div>
+                <div id="messagingHeatmap" class="chart"></div>
+            </div>
+        </div>
+
+        <div class="keyword-cloud">
+            <div class="chart-header">
+                <h2>Keyword Cloud Analysis</h2>
+            </div>
+            <div id="keywordCloud" class="chart" style="height: 500px;"></div>
+        </div>
+
+        <div class="insights-section">
+            <div class="insights-header">
+                <h2>Strategic Insights & Recommendations</h2>
+                <p>Data-driven insights for optimizing your content campaign</p>
+            </div>
+            
+            <div class="insight-grid">
+                <div class="insight-card">
+                    <div class="insight-title">
+                        <span>🎯</span> Primary Value Proposition
+                    </div>
+                    <div class="insight-content">
+                        "Automatic cleaning" appears in 71% of segments, making it the core selling point. This feature addresses the universal pain point of manual litter maintenance across all demographics.
+                        <div class="recommendation">
+                            <strong>Recommendation:</strong> Lead all campaigns with automation benefits, then customize secondary features by segment.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">
+                        <span>📊</span> Segment Prioritization
+                    </div>
+                    <div class="insight-content">
+                        Smart home users and health-conscious owners show the highest feature alignment (2+ key features each) and represent tech-forward early adopters.
+                        <div class="recommendation">
+                            <strong>Recommendation:</strong> Allocate 40% of budget to these high-affinity segments for initial market penetration.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">
+                        <span>💬</span> Messaging Strategy
+                    </div>
+                    <div class="insight-content">
+                        Copy analysis reveals three core themes: convenience (43%), health monitoring (29%), and lifestyle integration (28%).
+                        <div class="recommendation">
+                            <strong>Recommendation:</strong> Create A/B tests with convenience-first vs. health-first messaging to identify top performers.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">
+                        <span>🔍</span> SEO Opportunity
+                    </div>
+                    <div class="insight-content">
+                        Generic terms "self cleaning litter box" and "automatic litter box" appear in 100% of segments, indicating high competition but essential targeting.
+                        <div class="recommendation">
+                            <strong>Recommendation:</strong> Combine generic terms with segment-specific modifiers (e.g., "apartment-friendly", "senior-safe") for better targeting.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="keyword-cloud">
+            <div class="chart-header">
+                <h2>Tag Strategy Analysis</h2>
+            </div>
+            <div class="tag-analysis">
+                <div class="tag-category">
+                    <h4>Universal Tags (All Segments)</h4>
+                    <div class="tag-list">
+                        <span class="tag">#SmartLitterBox</span>
+                        <span class="tag">#PetTech</span>
+                        <span class="tag">#CatCare</span>
+                        <span class="tag">#PetCareMadeEasy</span>
+                    </div>
+                </div>
+                <div class="tag-category">
+                    <h4>Lifestyle Tags</h4>
+                    <div class="tag-list">
+                        <span class="tag">#BusyLife</span>
+                        <span class="tag">#SmartHome</span>
+                        <span class="tag">#ApartmentLife</span>
+                        <span class="tag">#FamilyLife</span>
+                    </div>
+                </div>
+                <div class="tag-category">
+                    <h4>Health & Wellness Tags</h4>
+                    <div class="tag-list">
+                        <span class="tag">#CatHealth</span>
+                        <span class="tag">#PetWellness</span>
+                        <span class="tag">#HealthyPets</span>
+                        <span class="tag">#PetMonitoring</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Feature Radar Chart
+        const featureRadarChart = echarts.init(document.getElementById('featureRadar'));
+        const featureRadarOption = {
+            tooltip: {},
+            legend: {
+                data: ['Feature Distribution'],
+                top: 10
+            },
+            radar: {
+                indicator: [
+                    { name: 'Auto Cleaning', max: 7 },
+                    { name: 'Health Monitoring', max: 7 },
+                    { name: 'Odor Control', max: 7 },
+                    { name: 'App Control', max: 7 },
+                    { name: 'Easy Operation', max: 7 }
+                ],
+                radius: '70%'
+            },
+            series: [{
+                name: 'Feature Emphasis',
+                type: 'radar',
+                data: [
+                    {
+                        value: [5, 3, 2, 2, 2],
+                        name: 'Feature Distribution',
+                        areaStyle: {
+                            color: 'rgba(102, 126, 234, 0.5)'
+                        },
+                        lineStyle: {
+                            color: '#667eea',
+                            width: 2
+                        }
+                    }
+                ]
+            }]
+        };
+        featureRadarChart.setOption(featureRadarOption);
+
+        // Keyword Sankey Diagram
+        const keywordSankeyChart = echarts.init(document.getElementById('keywordSankey'));
+        const keywordSankeyOption = {
+            tooltip: {
+                trigger: 'item',
+                triggerOn: 'mousemove'
+            },
+            series: [
+                {
+                    type: 'sankey',
+                    data: [
+                        { name: 'Busy Professionals' },
+                        { name: 'Health-Conscious' },
+                        { name: 'Apartment Dwellers' },
+                        { name: 'Senior Owners' },
+                        { name: 'Smart Home Users' },
+                        { name: 'Pet Professionals' },
+                        { name: 'Young Families' },
+                        { name: 'self cleaning' },
+                        { name: 'automatic' },
+                        { name: 'health tracking' },
+                        { name: 'space-saving' },
+                        { name: 'app-controlled' }
+                    ],
+                    links: [
+                        { source: 'Busy Professionals', target: 'self cleaning', value: 3 },
+                        { source: 'Busy Professionals', target: 'automatic', value: 3 },
+                        { source: 'Health-Conscious', target: 'health tracking', value: 4 },
+                        { source: 'Health-Conscious', target: 'self cleaning', value: 2 },
+                        { source: 'Apartment Dwellers', target: 'space-saving', value: 3 },
+                        { source: 'Apartment Dwellers', target: 'self cleaning', value: 2 },
+                        { source: 'Senior Owners', target: 'automatic', value: 4 },
+                        { source: 'Smart Home Users', target: 'app-controlled', value: 4 },
+                        { source: 'Smart Home Users', target: 'automatic', value: 2 },
+                        { source: 'Pet Professionals', target: 'health tracking', value: 3 },
+                        { source: 'Young Families', target: 'self cleaning', value: 3 },
+                        { source: 'Young Families', target: 'automatic', value: 2 }
+                    ],
+                    emphasis: {
+                        focus: 'adjacency'
+                    },
+                    lineStyle: {
+                        color: 'gradient',
+                        curveness: 0.5
+                    },
+                    itemStyle: {
+                        borderWidth: 1,
+                        borderColor: '#aaa'
+                    }
+                }
+            ]
+        };
+        keywordSankeyChart.setOption(keywordSankeyOption);
+
+        // Content Strategy Pie Chart
+        const contentPieChart = echarts.init(document.getElementById('contentPie'));
+        const contentPieOption = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b}: {d}%'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                top: 'center'
+            },
+            series: [
+                {
+                    name: 'Content Focus',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 40,
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: [
+                        { value: 43, name: 'Convenience Focus', itemStyle: { color: '#FF6B6B' } },
+                        { value: 29, name: 'Health Monitoring', itemStyle: { color: '#4ECDC4' } },
+                        { value: 28, name: 'Lifestyle Integration', itemStyle: { color: '#45B7D1' } }
+                    ]
+                }
+            ]
+        };
+        contentPieChart.setOption(contentPieOption);
+
+        // Messaging Heatmap
+        const messagingHeatmapChart = echarts.init(document.getElementById('messagingHeatmap'));
+        const messagingData = [
+            [0, 0, 10], [0, 1, 8], [0, 2, 6], [0, 3, 7],
+            [1, 0, 7], [1, 1, 10], [1, 2, 4], [1, 3, 9],
+            [2, 0, 5], [2, 1, 3], [2, 2, 10], [2, 3, 4],
+            [3, 0, 9], [3, 1, 8], [3, 2, 5], [3, 3, 10],
+            [4, 0, 8], [4, 1, 7], [4, 2, 9], [4, 3, 10],
+            [5, 0, 6], [5, 1, 10], [5, 2, 4], [5, 3, 7],
+            [6, 0, 10], [6, 1, 5], [6, 2, 8], [6, 3, 6]
+        ];
+
+        const messagingHeatmapOption = {
+            tooltip: {
+                position: 'top'
+            },
+            grid: {
+                height: '70%',
+                top: '10%'
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Time-Saving', 'Health Focus', 'Space Efficiency', 'Tech Integration'],
+                splitArea: {
+                    show: true
+                }
+            },
+            yAxis: {
+                type: 'category',
+                data: ['Busy Prof.', 'Health-Conscious', 'Apartment', 'Senior', 'Smart Home', 'Professional', 'Family'],
+                splitArea: {
+                    show: true
+                }
+            },
+            visualMap: {
+                min: 0,
+                max: 10,
+                calculable: true,
+                orient: 'horizontal',
+                left: 'center',
+                bottom: '5%',
+                inRange: {
+                    color: ['#e0f2f1', '#4db6ac', '#00897b']
+                }
+            },
+            series: [{
+                name: 'Message Alignment',
+                type: 'heatmap',
+                data: messagingData,
+                label: {
+                    show: true
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }]
+        };
+        messagingHeatmapChart.setOption(messagingHeatmapOption);
+
+        // Keyword Cloud
+        const keywordCloudChart = echarts.init(document.getElementById('keywordCloud'));
+        const keywords = [
+            { name: 'self cleaning litter box', value: 70 },
+            { name: 'automatic litter box', value: 70 },
+            { name: 'litter box', value: 70 },
+            { name: 'Smart litter box', value: 40 },
+            { name: 'Time-saving', value: 35 },
+            { name: 'Health tracker', value: 30 },
+            { name: 'Odor-free', value: 25 },
+            { name: 'App-controlled', value: 30 },
+            { name: 'Space-saving', value: 20 },
+            { name: 'Senior-friendly', value: 15 },
+            { name: 'Pet wellness', value: 25 },
+            { name: 'Smart home', value: 30 },
+            { name: 'Professional solution', value: 20 },
+            { name: 'Family-friendly', value: 25 },
+            { name: 'Easy pet care', value: 35 },
+            { name: 'Connected home', value: 20 },
+            { name: 'Pet monitoring', value: 25 },
+            { name: 'Convenient', value: 30 },
+            { name: 'Pet tech', value: 35 },
+            { name: 'Busy owners', value: 20 }
+        ];
+
+        const keywordCloudOption = {
+            series: [{
+                type: 'wordCloud',
+                shape: 'circle',
+                left: 'center',
+                top: 'center',
+                width: '90%',
+                height: '90%',
+                right: null,
+                bottom: null,
+                sizeRange: [15, 80],
+                rotationRange: [-45, 45],
+                rotationStep: 45,
+                gridSize: 8,
+                drawOutOfBound: false,
+                layoutAnimation: true,
+                textStyle: {
+                    fontFamily: 'sans-serif',
+                    fontWeight: 'bold',
+                    color: function () {
+                        return 'rgb(' + [
+                            Math.round(Math.random() * 160 + 80),
+                            Math.round(Math.random() * 160 + 80),
+                            Math.round(Math.random() * 160 + 80)
+                        ].join(',') + ')';
+                    }
+                },
+                emphasis: {
+                    focus: 'self',
+                    textStyle: {
+                        textShadowBlur: 10,
+                        textShadowColor: '#333'
+                    }
+                },
+                data: keywords
+            }]
+        };
+        keywordCloudChart.setOption(keywordCloudOption);
+
+        // Responsive
+        window.addEventListener('resize', function() {
+            featureRadarChart.resize();
+            keywordSankeyChart.resize();
+            contentPieChart.resize();
+            messagingHeatmapChart.resize();
+            keywordCloudChart.resize();
+        });
+    </script>
+</body>
+</html>
