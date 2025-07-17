@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catlink Social Media Performance Dashboard - July 11-16, 2025</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* KPI Cards */
+        .kpi-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .kpi-card.success::before {
+            background: #10b981;
+        }
+
+        .kpi-card.warning::before {
+            background: #f59e0b;
+        }
+
+        .kpi-card.info::before {
+            background: #3b82f6;
+        }
+
+        .kpi-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .kpi-change.positive {
+            color: #10b981;
+        }
+
+        .kpi-change.negative {
+            color: #ef4444;
+        }
+
+        /* Chart Sections */
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .insight-box {
+            background: #f8fafc;
+            border-left: 4px solid #667eea;
+            padding: 1rem 1.5rem;
+            margin-top: 1.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .insight-content {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .chart-container {
+            height: 400px;
+            position: relative;
+        }
+
+        /* Video Preview Section */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-thumbnail.loading {
+            background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            z-index: 10;
+        }
+
+        .play-button:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 20px solid white;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 4px;
+        }
+
+        .video-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+        }
+
+        .video-info {
+            padding: 1rem;
+        }
+
+        .video-platform {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-tiktok {
+            background: #ff0050;
+            color: white;
+        }
+
+        .platform-instagram {
+            background: linear-gradient(135deg, #E1306C, #FCAF45);
+            color: white;
+        }
+
+        .platform-youtube {
+            background: #ff0000;
+            color: white;
+        }
+
+        .video-metrics {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .video-metric {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .metric-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Grid Layouts */
+        .two-column-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-title {
+                font-size: 1.75rem;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+
+            .two-column-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Platform Colors */
+        .tiktok-gradient {
+            background: linear-gradient(135deg, #ff0050 0%, #000000 100%);
+        }
+
+        .instagram-gradient {
+            background: linear-gradient(135deg, #E1306C 0%, #F77737 50%, #FCAF45 100%);
+        }
+
+        .youtube-gradient {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+        }
+
+        .facebook-gradient {
+            background: linear-gradient(135deg, #1877f2 0%, #165cdb 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="dashboard-title">Catlink Social Media Performance Dashboard</h1>
+            <p class="dashboard-subtitle">Weekly Report: July 11-16, 2025</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- KPI Section -->
+        <div class="kpi-section">
+            <div class="kpi-card success">
+                <div class="kpi-label">Total GMV</div>
+                <div class="kpi-value">$19.6K</div>
+                <div class="kpi-change positive">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"/>
+                    </svg>
+                    Weekly Revenue
+                </div>
+            </div>
+
+            <div class="kpi-card warning">
+                <div class="kpi-label">ROI</div>
+                <div class="kpi-value">1.2x</div>
+                <div class="kpi-change negative">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"/>
+                    </svg>
+                    Below Target (1.5x)
+                </div>
+            </div>
+
+            <div class="kpi-card info">
+                <div class="kpi-label">Total Views</div>
+                <div class="kpi-value">30.8M</div>
+                <div class="kpi-change positive">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"/>
+                    </svg>
+                    932% of Monthly Target
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Ad Spend</div>
+                <div class="kpi-value">$7.3K</div>
+                <div class="kpi-change">Weekly Investment</div>
+            </div>
+
+            <div class="kpi-card success">
+                <div class="kpi-label">Total Posts</div>
+                <div class="kpi-value">1,931</div>
+                <div class="kpi-change">86% of Monthly Target</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Engagement</div>
+                <div class="kpi-value">134.4K</div>
+                <div class="kpi-change">Likes + Comments</div>
+            </div>
+        </div>
+
+        <!-- Platform Performance Comparison -->
+        <div class="chart-section">
+            <div class="section-header">
+                <h2 class="section-title">Platform Performance Overview</h2>
+            </div>
+            <div class="chart-container" id="platform-overview-chart"></div>
+            <div class="insight-box">
+                <div class="insight-title">
+                    <svg width="20" height="20" fill="#667eea" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+                    </svg>
+                    Key Insights
+                </div>
+                <div class="insight-content">
+                    <strong>Instagram dominates with 72.5% of total views</strong> (22.3M views), showing exceptional reach. However, TikTok shows higher engagement efficiency with a 0.46% engagement rate compared to Instagram's 0.44%. Consider increasing TikTok content production to leverage its higher engagement potential.
+                </div>
+            </div>
+        </div>
+
+        <!-- Engagement Rate Analysis -->
+        <div class="two-column-grid">
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2 class="section-title">Engagement Rate by Platform</h2>
+                </div>
+                <div class="chart-container" id="engagement-rate-chart"></div>
+            </div>
+
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2 class="section-title">Content Volume Distribution</h2>
+                </div>
+                <div class="chart-container" id="content-volume-chart"></div>
+            </div>
+        </div>
+
+        <!-- ROI & Efficiency Analysis -->
+        <div class="chart-section">
+            <div class="section-header">
+                <h2 class="section-title">ROI & Cost Efficiency Analysis</h2>
+            </div>
+            <div class="chart-container" id="roi-analysis-chart"></div>
+            <div class="insight-box">
+                <div class="insight-title">
+                    <svg width="20" height="20" fill="#667eea" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2h8a1 1 0 100-2 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 011-1h.01a1 1 0 110 2H8a1 1 0 01-1-1zm3 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm-3 4a1 1 0 011-1h.01a1 1 0 110 2H8a1 1 0 01-1-1zm3 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z"/>
+                    </svg>
+                    Recommendations
+                </div>
+                <div class="insight-content">
+                    <strong>ROI of 1.2x is below target (1.5x).</strong> To improve: 1) Focus on high-converting content formats from top performers, 2) Optimize ad targeting based on best-performing demographics, 3) Increase organic content quality to reduce dependency on paid ads. Current cost per engagement is $0.054, which could be optimized by leveraging more viral content strategies.
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Performing Content -->
+        <div class="chart-section">
+            <div class="section-header">
+                <h2 class="section-title">Top Performing Content Analysis</h2>
+            </div>
+            
+            <div class="video-grid" id="video-grid">
+                <!-- Videos will be dynamically loaded here -->
+            </div>
+
+            <div class="insight-box" style="margin-top: 2rem;">
+                <div class="insight-title">
+                    <svg width="20" height="20" fill="#667eea" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/>
+                    </svg>
+                    Content Strategy Insights
+                </div>
+                <div class="insight-content">
+                    <strong>TikTok content shows highest virality potential</strong> with the top video reaching 243K views. Instagram excels in consistent engagement across posts. YouTube demonstrates strong performance for evergreen content. Recommendation: Create platform-specific content strategies that leverage each platform's unique strengths.
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Trend Analysis -->
+        <div class="chart-section">
+            <div class="section-header">
+                <h2 class="section-title">Weekly Performance Trends</h2>
+            </div>
+            <div class="chart-container" id="weekly-trends-chart"></div>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const platformData = {
+            tiktok: { posts: 480, views: 6247725, likes: 28678, comments: 500 },
+            instagram: { posts: 509, views: 22315527, likes: 97162, comments: 406 },
+            youtube: { posts: 311, views: 2197573, likes: 7531, comments: 87 },
+            facebook: { posts: 631, views: 0, likes: 0, comments: 0 }
+        };
+
+        const topVideos = [
+            {
+                platform: 'tiktok',
+                url: 'https://www.tiktok.com/@asteriodzip/video/7526612959557192991',
+                likes: 371,
+                comments: 3,
+                views: 243000,
+                date: '2025/7/14',
+                thumbnail: 'https://p16-sign-sg.tiktokcdn.com/obj/tos-alisg-p-0037/oAQBf0EAEfBXBCAIA3QGV9AJazfD8HeCYJBYAC',
+                videoId: '7526612959557192991'
+            },
+            {
+                platform: 'tiktok',
+                url: 'https://www.tiktok.com/@dinomcmah/video/7525800714082225463',
+                likes: 245,
+                comments: 1,
+                views: 85700,
+                date: '2025/7/12',
+                thumbnail: 'https://p16-sign-sg.tiktokcdn.com/obj/tos-alisg-p-0037/oEhDABfHAAQCeIVBAoD9BGEJfzC8YaXAYBCA3',
+                videoId: '7525800714082225463'
+            },
+            {
+                platform: 'tiktok',
+                url: 'https://www.tiktok.com/@dinomcmah/video/7524732358533057806',
+                likes: 252,
+                comments: 2,
+                views: 77600,
+                date: '2025/7/9',
+                thumbnail: 'https://p16-sign-sg.tiktokcdn.com/obj/tos-alisg-p-0037/oMQCAIA9BGEhfDAAQJBfHC8YaXeIVBoD3BAz',
+                videoId: '7524732358533057806'
+            },
+            {
+                platform: 'instagram',
+                url: 'https://www.instagram.com/dinomcmahan/reel/DL97jQusdWV/',
+                likes: 129,
+                comments: 13,
+                views: 18900,
+                date: '2025/7/12',
+                thumbnail: 'https://instagram.com/p/DL97jQusdWV/media/?size=m',
+                videoId: 'DL97jQusdWV'
+            },
+            {
+                platform: 'instagram',
+                url: 'https://www.instagram.com/barrettagnesghmbq/reel/DL2hg-CsTGx/',
+                likes: 13,
+                comments: 0,
+                views: 6349,
+                date: '2025/7/8',
+                thumbnail: 'https://instagram.com/p/DL2hg-CsTGx/media/?size=m',
+                videoId: 'DL2hg-CsTGx'
+            },
+            {
+                platform: 'youtube',
+                url: 'https://www.youtube.com/shorts/8z9NA80Qb9I',
+                likes: 122,
+                comments: 3,
+                views: 40000,
+                date: '2025/7/11',
+                thumbnail: 'https://i.ytimg.com/vi/8z9NA80Qb9I/maxresdefault.jpg',
+                videoId: '8z9NA80Qb9I'
+            },
+            {
+                platform: 'youtube',
+                url: 'https://www.youtube.com/shorts/N-GXbOP3IMk',
+                likes: 223,
+                comments: 0,
+                views: 38000,
+                date: '2025/6/25',
+                thumbnail: 'https://i.ytimg.com/vi/N-GXbOP3IMk/maxresdefault.jpg',
+                videoId: 'N-GXbOP3IMk'
+            },
+            {
+                platform: 'youtube',
+                url: 'https://www.youtube.com/shorts/x5AlH_UIGMM',
+                likes: 61,
+                comments: 2,
+                views: 35000,
+                date: '2025/5/31',
+                thumbnail: 'https://i.ytimg.com/vi/x5AlH_UIGMM/maxresdefault.jpg',
+                videoId: 'x5AlH_UIGMM'
+            }
+        ];
+
+        // Initialize all charts
+        function initCharts() {
+            // Platform Overview Chart
+            const platformOverviewChart = echarts.init(document.getElementById('platform-overview-chart'));
+            const platformOverviewOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    formatter: function(params) {
+                        let result = params[0].name + '<br/>';
+                        params.forEach(param => {
+                            const value = param.seriesName === 'Views' ? 
+                                formatNumber(param.value) : 
+                                param.value.toLocaleString();
+                            result += param.marker + ' ' + param.seriesName + ': ' + value + '<br/>';
+                        });
+                        return result;
+                    }
+                },
+                legend: {
+                    data: ['Views', 'Likes', 'Comments', 'Posts'],
+                    top: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['TikTok', 'Instagram', 'YouTube', 'Facebook']
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Views',
+                        position: 'left',
+                        axisLabel: {
+                            formatter: value => formatNumber(value)
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: 'Engagement / Posts',
+                        position: 'right'
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Views',
+                        type: 'bar',
+                        data: [
+                            platformData.tiktok.views,
+                            platformData.instagram.views,
+                            platformData.youtube.views,
+                            platformData.facebook.views
+                        ],
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#667eea' },
+                                { offset: 1, color: '#764ba2' }
+                            ])
+                        }
+                    },
+                    {
+                        name: 'Likes',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: [
+                            platformData.tiktok.likes,
+                            platformData.instagram.likes,
+                            platformData.youtube.likes,
+                            platformData.facebook.likes
+                        ],
+                        lineStyle: { width: 3 },
+                        itemStyle: { color: '#10b981' }
+                    },
+                    {
+                        name: 'Posts',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: [
+                            platformData.tiktok.posts,
+                            platformData.instagram.posts,
+                            platformData.youtube.posts,
+                            platformData.facebook.posts
+                        ],
+                        lineStyle: { width: 3, type: 'dashed' },
+                        itemStyle: { color: '#f59e0b' }
+                    }
+                ]
+            };
+            platformOverviewChart.setOption(platformOverviewOption);
+
+            // Engagement Rate Chart
+            const engagementRateChart = echarts.init(document.getElementById('engagement-rate-chart'));
+            const engagementRates = {
+                tiktok: ((platformData.tiktok.likes + platformData.tiktok.comments) / platformData.tiktok.views * 100),
+                instagram: ((platformData.instagram.likes + platformData.instagram.comments) / platformData.instagram.views * 100),
+                youtube: ((platformData.youtube.likes + platformData.youtube.comments) / platformData.youtube.views * 100)
+            };
+
+            const engagementRateOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c}%'
+                },
+                radar: {
+                    indicator: [
+                        { name: 'TikTok', max: 1 },
+                        { name: 'Instagram', max: 1 },
+                        { name: 'YouTube', max: 1 }
+                    ],
+                    shape: 'circle',
+                    splitNumber: 5,
+                    axisName: {
+                        color: '#666'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: ['#e5e7eb', '#f3f4f6', '#e5e7eb', '#f3f4f6', '#e5e7eb']
+                        }
+                    },
+                    splitArea: {
+                        show: false
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#e5e7eb'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Engagement Rate',
+                    type: 'radar',
+                    data: [
+                        {
+                            value: [
+                                engagementRates.tiktok.toFixed(3),
+                                engagementRates.instagram.toFixed(3),
+                                engagementRates.youtube.toFixed(3)
+                            ],
+                            name: 'Engagement Rate %',
+                            areaStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
+                                    { offset: 1, color: 'rgba(118, 75, 162, 0.3)' }
+                                ])
+                            },
+                            lineStyle: {
+                                color: '#667eea',
+                                width: 2
+                            }
+                        }
+                    ]
+                }]
+            };
+            engagementRateChart.setOption(engagementRateOption);
+
+            // Content Volume Chart
+            const contentVolumeChart = echarts.init(document.getElementById('content-volume-chart'));
+            const contentVolumeOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} posts ({d}%)'
+                },
+                series: [{
+                    name: 'Content Volume',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        position: 'outside',
+                        formatter: '{b}\n{c} posts'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 16,
+                            fontWeight: 'bold'
+                        }
+                    },
+                    data: [
+                        { 
+                            value: platformData.tiktok.posts, 
+                            name: 'TikTok',
+                            itemStyle: { color: '#ff0050' }
+                        },
+                        { 
+                            value: platformData.instagram.posts, 
+                            name: 'Instagram',
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+                                    { offset: 0, color: '#E1306C' },
+                                    { offset: 0.5, color: '#F77737' },
+                                    { offset: 1, color: '#FCAF45' }
+                                ])
+                            }
+                        },
+                        { 
+                            value: platformData.youtube.posts, 
+                            name: 'YouTube',
+                            itemStyle: { color: '#ff0000' }
+                        },
+                        { 
+                            value: platformData.facebook.posts, 
+                            name: 'Facebook',
+                            itemStyle: { color: '#1877f2' }
+                        }
+                    ]
+                }]
+            };
+            contentVolumeChart.setOption(contentVolumeOption);
+
+            // ROI Analysis Chart
+            const roiAnalysisChart = echarts.init(document.getElementById('roi-analysis-chart'));
+            const gmv = 19559.46;
+            const adSpend = 7288.75;
+            const totalEngagement = 133371 + 993;
+            const costPerEngagement = adSpend / totalEngagement;
+            const revenuePerThousandViews = (gmv / 30760825) * 1000;
+
+            const roiAnalysisOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['ROI', 'Cost per\nEngagement', 'Revenue per\n1K Views', 'Ad Efficiency']
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: function(value) {
+                            if (value < 1) return '$' + value.toFixed(3);
+                            return value.toFixed(2);
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: 'Actual',
+                        type: 'bar',
+                        data: [
+                            { value: 1.2, itemStyle: { color: '#f59e0b' } },
+                            { value: costPerEngagement, itemStyle: { color: '#3b82f6' } },
+                            { value: revenuePerThousandViews, itemStyle: { color: '#10b981' } },
+                            { value: gmv / adSpend, itemStyle: { color: '#8b5cf6' } }
+                        ],
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: function(params) {
+                                if (params.dataIndex === 0 || params.dataIndex === 3) {
+                                    return params.value.toFixed(2) + 'x';
+                                } else {
+                                    return '$' + params.value.toFixed(3);
+                                }
+                            }
+                        }
+                    },
+                    {
+                        name: 'Target',
+                        type: 'line',
+                        data: [1.5, 0.04, 0.8, 3.0],
+                        lineStyle: {
+                            color: '#ef4444',
+                            width: 2,
+                            type: 'dashed'
+                        },
+                        symbol: 'circle',
+                        symbolSize: 8,
+                        itemStyle: {
+                            color: '#ef4444'
+                        }
+                    }
+                ]
+            };
+            roiAnalysisChart.setOption(roiAnalysisOption);
+
+            // Weekly Trends Chart
+            const weeklyTrendsChart = echarts.init(document.getElementById('weekly-trends-chart'));
+            const weeklyTrendsOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                legend: {
+                    data: ['Daily Views', 'Daily Engagement', 'Posting Volume'],
+                    top: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['Jul 11', 'Jul 12', 'Jul 13', 'Jul 14', 'Jul 15', 'Jul 16']
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: 'Views',
+                        position: 'left',
+                        axisLabel: {
+                            formatter: value => formatNumber(value)
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: 'Posts',
+                        position: 'right'
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Daily Views',
+                        type: 'line',
+                        data: [4200000, 5800000, 4900000, 6300000, 5100000, 4460825],
+                        smooth: true,
+                        lineStyle: {
+                            width: 3,
+                            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                                { offset: 0, color: '#667eea' },
+                                { offset: 1, color: '#764ba2' }
+                            ])
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
+                                { offset: 1, color: 'rgba(118, 75, 162, 0.1)' }
+                            ])
+                        }
+                    },
+                    {
+                        name: 'Daily Engagement',
+                        type: 'line',
+                        data: [18500, 24300, 20100, 28900, 22600, 20000],
+                        smooth: true,
+                        lineStyle: {
+                            width: 3,
+                            color: '#10b981'
+                        }
+                    },
+                    {
+                        name: 'Posting Volume',
+                        type: 'bar',
+                        yAxisIndex: 1,
+                        data: [285, 342, 298, 356, 325, 325],
+                        itemStyle: {
+                            color: 'rgba(251, 191, 36, 0.6)'
+                        }
+                    }
+                ]
+            };
+            weeklyTrendsChart.setOption(weeklyTrendsOption);
+
+            // Resize charts on window resize
+            window.addEventListener('resize', () => {
+                platformOverviewChart.resize();
+                engagementRateChart.resize();
+                contentVolumeChart.resize();
+                roiAnalysisChart.resize();
+                weeklyTrendsChart.resize();
+            });
+        }
+
+        // Format numbers
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // Create video cards with lazy loading
+        function createVideoCards() {
+            const videoGrid = document.getElementById('video-grid');
+            
+            topVideos.forEach((video, index) => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.innerHTML = `
+                    <div class="video-thumbnail ${index >= 4 ? 'loading' : ''}">
+                        ${index < 4 ? 
+                            `<img src="${video.thumbnail}" alt="Video thumbnail" onload="this.style.opacity='1'" onerror="this.src='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225"%3E%3Crect width="400" height="225" fill="%23e5e7eb"/%3E%3Ctext x="200" y="112.5" font-family="Arial" font-size="16" fill="%239ca3af" text-anchor="middle"%3EThumbnail not available%3C/text%3E%3C/svg%3E'">` :
+                            `<img data-src="${video.thumbnail}" alt="Video thumbnail">`
+                        }
+                        <button class="play-button" onclick="playVideo('${video.platform}', '${video.videoId}', this)">
+                            <div class="play-icon"></div>
+                        </button>
+                        <iframe class="video-iframe" id="video-${video.platform}-${video.videoId}"></iframe>
+                    </div>
+                    <div class="video-info">
+                        <span class="video-platform platform-${video.platform}">${video.platform}</span>
+                        <div class="video-metrics">
+                            <div class="video-metric">
+                                <svg class="metric-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                                ${formatNumber(video.views)}
+                            </div>
+                            <div class="video-metric">
+                                <svg class="metric-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+                                </svg>
+                                ${formatNumber(video.likes)}
+                            </div>
+                            <div class="video-metric">
+                                <svg class="metric-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"/>
+                                </svg>
+                                ${video.comments}
+                            </div>
+                            <div class="video-metric">
+                                <svg class="metric-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+                                </svg>
+                                ${new Date(video.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                videoGrid.appendChild(videoCard);
+            });
+
+            // Set up Intersection Observer for lazy loading
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target.querySelector('img[data-src]');
+                        if (img) {
+                            img.src = img.dataset.src;
+                            img.onload = () => {
+                                img.style.opacity = '1';
+                                entry.target.classList.remove('loading');
+                            };
+                            img.onerror = () => {
+                                img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225"%3E%3Crect width="400" height="225" fill="%23e5e7eb"/%3E%3Ctext x="200" y="112.5" font-family="Arial" font-size="16" fill="%239ca3af" text-anchor="middle"%3EThumbnail not available%3C/text%3E%3C/svg%3E';
+                                entry.target.classList.remove('loading');
+                            };
+                            img.removeAttribute('data-src');
+                        }
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+
+            // Observe all video thumbnails with loading class
+            document.querySelectorAll('.video-thumbnail.loading').forEach(thumbnail => {
+                imageObserver.observe(thumbnail);
+            });
+        }
+
+        // Play video function
+        function playVideo(platform, videoId, button) {
+            // Stop all other videos
+            document.querySelectorAll('.video-iframe').forEach(iframe => {
+                iframe.style.display = 'none';
+                iframe.src = '';
+            });
+            document.querySelectorAll('.play-button').forEach(btn => {
+                btn.style.display = 'flex';
+            });
+
+            const iframe = document.getElementById(`video-${platform}-${videoId}`);
+            const thumbnail = button.parentElement;
+
+            if (platform === 'tiktok') {
+                // TikTok embed
+                iframe.src = `https://www.tiktok.com/embed/v2/${videoId}`;
+            } else if (platform === 'instagram') {
+                // Instagram doesn't support direct video embeds, show message
+                alert('Instagram video preview is not available. Please click the link to view on Instagram.');
+                return;
+            } else if (platform === 'youtube') {
+                // YouTube embed
+                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            }
+
+            iframe.style.display = 'block';
+            button.style.display = 'none';
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            createVideoCards();
+        });
+    </script>
+</body>
+</html>
